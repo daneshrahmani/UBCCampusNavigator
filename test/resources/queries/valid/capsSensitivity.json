@@ -1,0 +1,21 @@
+{
+	"title": "Testing caps sensitivity",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_instructor": "ELLIS, SIMON"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_id",
+				"sections_instructor",
+				"sections_avg"
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+	]
+}

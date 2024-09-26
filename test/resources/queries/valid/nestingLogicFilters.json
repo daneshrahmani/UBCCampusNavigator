@@ -1,0 +1,45 @@
+{
+	"title": "Querying on ID",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"NOT": {
+						"LT": {
+							"sections_avg": 92
+						}
+					}
+				},
+				{
+					"OR": [
+						{
+							"IS": {
+								"sections_dept": "wood"
+							}
+						},
+						{
+							"IS": {
+								"sections_dept": "zool"
+							}
+						}
+					]
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_avg"
+			],
+			"ORDER": "sections_dept"
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{"sections_dept":"zool","sections_avg":92},
+		{"sections_dept":"zool","sections_avg":92.71},
+		{"sections_dept":"zool","sections_avg":92.71},
+		{"sections_dept":"zool","sections_avg":92.1},
+		{"sections_dept":"zool","sections_avg":92.1}
+	]
+}

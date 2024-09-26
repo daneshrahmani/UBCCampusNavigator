@@ -1,0 +1,39 @@
+{
+	"title": "Order key is not in columns No Key",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"NOT": {
+						"LT": {
+							"sections_avg": 92
+						}
+					}
+				},
+				{
+					"OR": [
+						{
+							"IS": {
+								"sections_dept": "100"
+							}
+						},
+						{
+							"IS": {
+								"sections_dept": "zool"
+							}
+						}
+					]
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_avg"
+			],
+			"ORDER": "sections_id"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

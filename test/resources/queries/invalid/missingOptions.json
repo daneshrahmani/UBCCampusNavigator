@@ -1,0 +1,21 @@
+{
+	"title": "Query missing OPTIONS",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"GT": {
+						"sections_avg": 88
+					}
+				},
+				{
+					"IS": {
+						"sections_dept": "wood"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

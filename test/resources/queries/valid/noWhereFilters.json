@@ -1,0 +1,21 @@
+{
+	"title": "SELECT dept, avg WHERE avg > 97",
+	"input": {
+		"WHERE": {
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"validDatasetOneCourse_dept",
+				"validDatasetOneCourse_avg"
+			],
+			"ORDER": "validDatasetOneCourse_avg"
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"sections_dept": "aanb",
+			"sections_avg": 94.44
+		}
+	]
+}

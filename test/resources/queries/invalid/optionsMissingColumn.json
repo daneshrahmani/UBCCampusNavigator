@@ -1,0 +1,35 @@
+{
+	"title": "Options missing column",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"NOT": {
+						"LT": {
+							"sections_avg": 92
+						}
+					}
+				},
+				{
+					"OR": [
+						{
+							"IS": {
+								"sections_dept": "wood"
+							}
+						},
+						{
+							"IS": {
+								"sections_dept": "zool"
+							}
+						}
+					]
+				}
+			]
+		},
+		"OPTIONS": {
+			"ORDER": "sections_dept"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
