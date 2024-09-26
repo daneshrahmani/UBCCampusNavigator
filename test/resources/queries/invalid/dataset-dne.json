@@ -1,0 +1,14 @@
+{
+	"title": "SELECT from dataset that was not added",
+	"input": {
+		"WHERE": {},
+		"OPTIONS": {
+			"COLUMNS": [
+				"dne_title"
+			],
+			"ORDER": "dne_title"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

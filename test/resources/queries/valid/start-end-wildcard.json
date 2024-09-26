@@ -1,0 +1,775 @@
+{
+	"title": "Wildcard at string start and end",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_title": "*math*"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_title"
+			],
+			"ORDER": "sections_title"
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "biomathematics"
+		},
+		{
+			"sections_title": "discrete math"
+		},
+		{
+			"sections_title": "discrete math"
+		},
+		{
+			"sections_title": "discrete math"
+		},
+		{
+			"sections_title": "discrete math"
+		},
+		{
+			"sections_title": "discrete math"
+		},
+		{
+			"sections_title": "discrete math"
+		},
+		{
+			"sections_title": "discrete math"
+		},
+		{
+			"sections_title": "discrete math"
+		},
+		{
+			"sections_title": "discrete math"
+		},
+		{
+			"sections_title": "discrete math"
+		},
+		{
+			"sections_title": "discrete math"
+		},
+		{
+			"sections_title": "discrete math"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math compu"
+		},
+		{
+			"sections_title": "intro math phys"
+		},
+		{
+			"sections_title": "intro math phys"
+		},
+		{
+			"sections_title": "intro math phys"
+		},
+		{
+			"sections_title": "intro math phys"
+		},
+		{
+			"sections_title": "intro math phys"
+		},
+		{
+			"sections_title": "intro math phys"
+		},
+		{
+			"sections_title": "intro math phys"
+		},
+		{
+			"sections_title": "intro math phys"
+		},
+		{
+			"sections_title": "intro math phys"
+		},
+		{
+			"sections_title": "intro math phys"
+		},
+		{
+			"sections_title": "intro math phys"
+		},
+		{
+			"sections_title": "intro math phys"
+		},
+		{
+			"sections_title": "intro math phys"
+		},
+		{
+			"sections_title": "intro math phys"
+		},
+		{
+			"sections_title": "intro math phys"
+		},
+		{
+			"sections_title": "intro math phys"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "intro to math"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math demonstrtns"
+		},
+		{
+			"sections_title": "math electrophys"
+		},
+		{
+			"sections_title": "math electrophys"
+		},
+		{
+			"sections_title": "math electrophys"
+		},
+		{
+			"sections_title": "math electrophys"
+		},
+		{
+			"sections_title": "math for econmic"
+		},
+		{
+			"sections_title": "math for econmic"
+		},
+		{
+			"sections_title": "math for econmic"
+		},
+		{
+			"sections_title": "math for econmic"
+		},
+		{
+			"sections_title": "math for econmic"
+		},
+		{
+			"sections_title": "math for econmic"
+		},
+		{
+			"sections_title": "math for econmic"
+		},
+		{
+			"sections_title": "math for econmic"
+		},
+		{
+			"sections_title": "math for econmic"
+		},
+		{
+			"sections_title": "math for econmic"
+		},
+		{
+			"sections_title": "math mdl com dis"
+		},
+		{
+			"sections_title": "math mdl com dis"
+		},
+		{
+			"sections_title": "math mdl com dis"
+		},
+		{
+			"sections_title": "math mdl com dis"
+		},
+		{
+			"sections_title": "math mdl com dis"
+		},
+		{
+			"sections_title": "math mdl com dis"
+		},
+		{
+			"sections_title": "math mdl com dis"
+		},
+		{
+			"sections_title": "math mdl com dis"
+		},
+		{
+			"sections_title": "math modl in sci"
+		},
+		{
+			"sections_title": "math modl in sci"
+		},
+		{
+			"sections_title": "math modl in sci"
+		},
+		{
+			"sections_title": "math modl in sci"
+		},
+		{
+			"sections_title": "math modl in sci"
+		},
+		{
+			"sections_title": "math modl in sci"
+		},
+		{
+			"sections_title": "math modl in sci"
+		},
+		{
+			"sections_title": "math modl in sci"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math operations"
+		},
+		{
+			"sections_title": "math prblm slvng"
+		},
+		{
+			"sections_title": "math prblm slvng"
+		},
+		{
+			"sections_title": "math prblm slvng"
+		},
+		{
+			"sections_title": "math prblm slvng"
+		},
+		{
+			"sections_title": "math prblm slvng"
+		},
+		{
+			"sections_title": "math prblm slvng"
+		},
+		{
+			"sections_title": "math prblm slvng"
+		},
+		{
+			"sections_title": "math prblm slvng"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math proof"
+		},
+		{
+			"sections_title": "math rsrch&writn"
+		},
+		{
+			"sections_title": "math rsrch&writn"
+		},
+		{
+			"sections_title": "math rsrch&writn"
+		},
+		{
+			"sections_title": "math rsrch&writn"
+		},
+		{
+			"sections_title": "math rsrch&writn"
+		},
+		{
+			"sections_title": "math rsrch&writn"
+		},
+		{
+			"sections_title": "tch mathematcs 2"
+		},
+		{
+			"sections_title": "tch mathematcs 2"
+		},
+		{
+			"sections_title": "tech math sci"
+		},
+		{
+			"sections_title": "tech math sci"
+		},
+		{
+			"sections_title": "tech math sci"
+		},
+		{
+			"sections_title": "tech math sci"
+		},
+		{
+			"sections_title": "tech math sci"
+		},
+		{
+			"sections_title": "tech math sci"
+		},
+		{
+			"sections_title": "tech math sci"
+		},
+		{
+			"sections_title": "tech math sci"
+		},
+		{
+			"sections_title": "tech math sci"
+		},
+		{
+			"sections_title": "tech math sci"
+		},
+		{
+			"sections_title": "tech math sci"
+		},
+		{
+			"sections_title": "tech math sci"
+		},
+		{
+			"sections_title": "tech math sci"
+		},
+		{
+			"sections_title": "tech math sci"
+		},
+		{
+			"sections_title": "tech math sci"
+		},
+		{
+			"sections_title": "tech math sci"
+		},
+		{
+			"sections_title": "tech math sci"
+		}
+	]
+}

@@ -1,0 +1,471 @@
+{
+	"title": "Query with all operators",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"LT": {
+						"sections_avg": 80
+					}
+				},
+				{
+					"GT": {
+						"sections_avg": 78
+					}
+				},
+				{
+					"NOT": {
+						"EQ": {
+							"sections_year": 2015
+						}
+					}
+				},
+				{
+					"OR": [
+						{
+							"IS": {
+								"sections_title": "*math*"
+							}
+						},
+						{
+							"IS": {
+								"sections_title": "*sci*"
+							}
+						}
+					]
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_avg",
+				"sections_title",
+				"sections_year"
+			],
+			"ORDER": "sections_avg"
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"sections_avg": 78.03,
+			"sections_title": "intro math compu",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.04,
+			"sections_title": "scie seminar",
+			"sections_year": 2014
+		},
+		{
+			"sections_avg": 78.05,
+			"sections_title": "pharm scie iii",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.05,
+			"sections_title": "pharm scie iii",
+			"sections_year": 2007
+		},
+		{
+			"sections_avg": 78.1,
+			"sections_title": "scientifc reason",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.1,
+			"sections_title": "scientifc reason",
+			"sections_year": 2013
+		},
+		{
+			"sections_avg": 78.15,
+			"sections_title": "math demonstrtns",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.15,
+			"sections_title": "math demonstrtns",
+			"sections_year": 2010
+		},
+		{
+			"sections_avg": 78.18,
+			"sections_title": "intro to math",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.27,
+			"sections_title": "communicate scie",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.32,
+			"sections_title": "orl health sci i",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.33,
+			"sections_title": "planetary scienc",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.33,
+			"sections_title": "planetary scienc",
+			"sections_year": 2013
+		},
+		{
+			"sections_avg": 78.37,
+			"sections_title": "oral hlth sci ii",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.37,
+			"sections_title": "oral hlth sci ii",
+			"sections_year": 2011
+		},
+		{
+			"sections_avg": 78.43,
+			"sections_title": "advances fd sci",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.43,
+			"sections_title": "advances fd sci",
+			"sections_year": 2013
+		},
+		{
+			"sections_avg": 78.47,
+			"sections_title": "communicate scie",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.47,
+			"sections_title": "mdls in science",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.47,
+			"sections_title": "mdls in science",
+			"sections_year": 2011
+		},
+		{
+			"sections_avg": 78.5,
+			"sections_title": "sci frst issues",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.5,
+			"sections_title": "sci frst issues",
+			"sections_year": 2010
+		},
+		{
+			"sections_avg": 78.52,
+			"sections_title": "intr envrmnt sci",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.55,
+			"sections_title": "advances fd sci",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.58,
+			"sections_title": "food sci lab ii",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.58,
+			"sections_title": "food sci lab ii",
+			"sections_year": 2013
+		},
+		{
+			"sections_avg": 78.62,
+			"sections_title": "sci/med rhetoric",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.62,
+			"sections_title": "sci/med rhetoric",
+			"sections_year": 2014
+		},
+		{
+			"sections_avg": 78.67,
+			"sections_title": "ethical iss scie",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.67,
+			"sections_title": "ethical iss scie",
+			"sections_year": 2014
+		},
+		{
+			"sections_avg": 78.73,
+			"sections_title": "bldg science",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.73,
+			"sections_title": "bldg science",
+			"sections_year": 2012
+		},
+		{
+			"sections_avg": 78.76,
+			"sections_title": "intr envrmnt sci",
+			"sections_year": 2014
+		},
+		{
+			"sections_avg": 78.77,
+			"sections_title": "biomathematics",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.77,
+			"sections_title": "biomathematics",
+			"sections_year": 2008
+		},
+		{
+			"sections_avg": 78.79,
+			"sections_title": "intr envrmnt sci",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.81,
+			"sections_title": "earth&planet sci",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.81,
+			"sections_title": "earth&planet sci",
+			"sections_year": 2008
+		},
+		{
+			"sections_avg": 78.82,
+			"sections_title": "intr envrmnt sci",
+			"sections_year": 2014
+		},
+		{
+			"sections_avg": 78.89,
+			"sections_title": "scie seminar",
+			"sections_year": 2014
+		},
+		{
+			"sections_avg": 78.9,
+			"sections_title": "intr envrmnt sci",
+			"sections_year": 2013
+		},
+		{
+			"sections_avg": 78.9,
+			"sections_title": "issues arts&sci",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.9,
+			"sections_title": "issues arts&sci",
+			"sections_year": 2008
+		},
+		{
+			"sections_avg": 78.91,
+			"sections_title": "communicate scie",
+			"sections_year": 2014
+		},
+		{
+			"sections_avg": 78.98,
+			"sections_title": "earth&planet sci",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 78.98,
+			"sections_title": "earth&planet sci",
+			"sections_year": 2014
+		},
+		{
+			"sections_avg": 79,
+			"sections_title": "intro to math",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 79,
+			"sections_title": "intro to math",
+			"sections_year": 2008
+		},
+		{
+			"sections_avg": 79,
+			"sections_title": "oral hlth sci ii",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 79,
+			"sections_title": "oral hlth sci ii",
+			"sections_year": 2012
+		},
+		{
+			"sections_avg": 79.06,
+			"sections_title": "intr envrmnt sci",
+			"sections_year": 2011
+		},
+		{
+			"sections_avg": 79.08,
+			"sections_title": "scie seminar",
+			"sections_year": 2014
+		},
+		{
+			"sections_avg": 79.08,
+			"sections_title": "bldg science",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 79.08,
+			"sections_title": "bldg science",
+			"sections_year": 2010
+		},
+		{
+			"sections_avg": 79.09,
+			"sections_title": "oral hlth sci ii",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 79.09,
+			"sections_title": "oral hlth sci ii",
+			"sections_year": 2013
+		},
+		{
+			"sections_avg": 79.11,
+			"sections_title": "communicate scie",
+			"sections_year": 2012
+		},
+		{
+			"sections_avg": 79.14,
+			"sections_title": "scientifc reason",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 79.14,
+			"sections_title": "scientifc reason",
+			"sections_year": 2008
+		},
+		{
+			"sections_avg": 79.17,
+			"sections_title": "cog neuroscience",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 79.17,
+			"sections_title": "discrete math",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 79.17,
+			"sections_title": "discrete math",
+			"sections_year": 2016
+		},
+		{
+			"sections_avg": 79.22,
+			"sections_title": "biomathematics",
+			"sections_year": 2007
+		},
+		{
+			"sections_avg": 79.33,
+			"sections_title": "communicate scie",
+			"sections_year": 2013
+		},
+		{
+			"sections_avg": 79.33,
+			"sections_title": "mdls in science",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 79.33,
+			"sections_title": "mdls in science",
+			"sections_year": 2013
+		},
+		{
+			"sections_avg": 79.35,
+			"sections_title": "advances fd sci",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 79.35,
+			"sections_title": "advances fd sci",
+			"sections_year": 2014
+		},
+		{
+			"sections_avg": 79.42,
+			"sections_title": "int res envr sci",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 79.57,
+			"sections_title": "scientifc reason",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 79.61,
+			"sections_title": "prin frst sci",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 79.61,
+			"sections_title": "prin frst sci",
+			"sections_year": 2007
+		},
+		{
+			"sections_avg": 79.63,
+			"sections_title": "communicate scie",
+			"sections_year": 2014
+		},
+		{
+			"sections_avg": 79.66,
+			"sections_title": "communicate scie",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 79.75,
+			"sections_title": "scie seminar",
+			"sections_year": 2010
+		},
+		{
+			"sections_avg": 79.79,
+			"sections_title": "biomathematics",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 79.79,
+			"sections_title": "biomathematics",
+			"sections_year": 2009
+		},
+		{
+			"sections_avg": 79.87,
+			"sections_title": "communicate scie",
+			"sections_year": 2014
+		},
+		{
+			"sections_avg": 79.87,
+			"sections_title": "communicate scie",
+			"sections_year": 2012
+		},
+		{
+			"sections_avg": 79.9,
+			"sections_title": "scie seminar",
+			"sections_year": 2010
+		},
+		{
+			"sections_avg": 79.92,
+			"sections_title": "mdls in science",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 79.92,
+			"sections_title": "mdls in science",
+			"sections_year": 2008
+		},
+		{
+			"sections_avg": 79.94,
+			"sections_title": "intr envrmnt sci",
+			"sections_year": 1900
+		},
+		{
+			"sections_avg": 79.97,
+			"sections_title": "biomathematics",
+			"sections_year": 1900
+		}
+	]
+}

@@ -1,0 +1,9 @@
+{
+	"title": "Query missing COLUMNS key",
+	"input": {
+		"WHERE": {},
+		"OPTIONS": {}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
