@@ -7,9 +7,9 @@ import {
 	ResultTooLargeError,
 } from "../../src/controller/IInsightFacade";
 import InsightFacade from "../../src/controller/InsightFacade";
-import {clearDisk, getContentFromArchives, loadTestQuery} from "../TestUtil";
+import { clearDisk, getContentFromArchives, loadTestQuery } from "../TestUtil";
 
-import {expect, use} from "chai";
+import { expect, use } from "chai";
 import chaiAsPromised from "chai-as-promised";
 
 use(chaiAsPromised);
@@ -36,9 +36,7 @@ describe("InsightFacade", function () {
 	before(async function () {
 		// This block runs once and loads the datasets.
 		sections = await getContentFromArchives("pair.zip");
-		validDatasetOneCourse = await getContentFromArchives(
-			"validDatasetOneCourse.zip"
-		);
+		validDatasetOneCourse = await getContentFromArchives("validDatasetOneCourse.zip");
 		noCoursesDirDataset = await getContentFromArchives("noCoursesDir.zip");
 		invalidJSONDataset = await getContentFromArchives("invalidJSON.zip");
 		noResultKeyDataset = await getContentFromArchives("noResultKey.zip");
@@ -61,11 +59,7 @@ describe("InsightFacade", function () {
 			await clearDisk();
 		});
 		it("Success AddDataset -> Adds a valid dataset", async function () {
-			const result = await facade.addDataset(
-				"WRDS150",
-				sections,
-				InsightDatasetKind.Sections
-			);
+			const result = await facade.addDataset("WRDS150", sections, InsightDatasetKind.Sections);
 
 			// Check that the result is an array
 			expect(result).to.be.an("array");
@@ -79,16 +73,8 @@ describe("InsightFacade", function () {
 		it("Success AddDataset -> Adding multiple datasets", async function () {
 			const testIDs = ["testDataset1", "testDataset2"];
 			const expectedLength = testIDs.length;
-			await facade.addDataset(
-				testIDs[0],
-				validDatasetOneCourse,
-				InsightDatasetKind.Sections
-			);
-			const result = await facade.addDataset(
-				testIDs[1],
-				sections,
-				InsightDatasetKind.Sections
-			);
+			await facade.addDataset(testIDs[0], validDatasetOneCourse, InsightDatasetKind.Sections);
+			const result = await facade.addDataset(testIDs[1], sections, InsightDatasetKind.Sections);
 
 			expect(result).to.be.an("array");
 			expect(result).to.have.lengthOf(expectedLength);
@@ -101,16 +87,8 @@ describe("InsightFacade", function () {
 			const testIDs = ["TESTid", "testID"];
 			const expectedDatasetCount = testIDs.length;
 
-			await facade.addDataset(
-				testIDs[0],
-				sections,
-				InsightDatasetKind.Sections
-			);
-			const result = await facade.addDataset(
-				testIDs[1],
-				validDatasetOneCourse,
-				InsightDatasetKind.Sections
-			);
+			await facade.addDataset(testIDs[0], sections, InsightDatasetKind.Sections);
+			const result = await facade.addDataset(testIDs[1], validDatasetOneCourse, InsightDatasetKind.Sections);
 
 			expect(result).to.be.an("array");
 			expect(result).to.have.lengthOf(expectedDatasetCount);
@@ -120,9 +98,7 @@ describe("InsightFacade", function () {
 		});
 
 		it("Success AddDataset -> Allows adding section where all string fields are empty", async function () {
-			const validEmptyStringFields = await getContentFromArchives(
-				"validEmptyStringFields.zip"
-			);
+			const validEmptyStringFields = await getContentFromArchives("validEmptyStringFields.zip");
 
 			const result = await facade.addDataset(
 				"testingEmptyStringFields",
@@ -131,9 +107,7 @@ describe("InsightFacade", function () {
 			);
 
 			expect(result).to.be.an("array");
-			expect(result[0])
-				.to.be.a("string")
-				.and.to.equal("testingEmptyStringFields");
+			expect(result[0]).to.be.a("string").and.to.equal("testingEmptyStringFields");
 		});
 		it("Maintains result array in multiple instances of InsightFacade", async function () {
 			// Add to one instance then make another and check that result is the same
@@ -144,11 +118,7 @@ describe("InsightFacade", function () {
 					numRows: 1,
 				},
 			];
-			await facade.addDataset(
-				"testDatasetPersistence",
-				validDatasetOneCourse,
-				InsightDatasetKind.Sections
-			);
+			await facade.addDataset("testDatasetPersistence", validDatasetOneCourse, InsightDatasetKind.Sections);
 			const newFacade = new InsightFacade();
 
 			const result = await newFacade.listDatasets();
@@ -161,7 +131,6 @@ describe("InsightFacade", function () {
 			});
 		});
 		describe("Failure Cases", function () {
-
 			/////// ID INPUT FAILURE CASES ///////
 			it("addDataset: empty id throws InsightError", async function () {
 				try {
@@ -174,11 +143,7 @@ describe("InsightFacade", function () {
 
 			it("addDataset: id with underscore throws InsightError", async function () {
 				try {
-					await facade.addDataset(
-						"invalid_id",
-						sections,
-						InsightDatasetKind.Sections
-					);
+					await facade.addDataset("invalid_id", sections, InsightDatasetKind.Sections);
 					expect.fail("Should have thrown above.");
 				} catch (err) {
 					expect(err).to.be.instanceOf(InsightError);
@@ -196,16 +161,8 @@ describe("InsightFacade", function () {
 
 			it("addDataset: duplicate id throws InsightError", async function () {
 				try {
-					await facade.addDataset(
-						"dataset",
-						sections,
-						InsightDatasetKind.Sections
-					);
-					await facade.addDataset(
-						"dataset",
-						sections,
-						InsightDatasetKind.Sections
-					);
+					await facade.addDataset("dataset", sections, InsightDatasetKind.Sections);
+					await facade.addDataset("dataset", sections, InsightDatasetKind.Sections);
 					expect.fail("Should have thrown above.");
 				} catch (err) {
 					expect(err).to.be.instanceOf(InsightError);
@@ -224,11 +181,7 @@ describe("InsightFacade", function () {
 
 			it("addDataset: zip's root directory has no 'courses' dir throws InsightError", async function () {
 				try {
-					await facade.addDataset(
-						"dataset",
-						noCoursesDirDataset,
-						InsightDatasetKind.Sections
-					);
+					await facade.addDataset("dataset", noCoursesDirDataset, InsightDatasetKind.Sections);
 					expect.fail("Should have thrown above.");
 				} catch (err) {
 					expect(err).to.be.instanceOf(InsightError);
@@ -237,11 +190,7 @@ describe("InsightFacade", function () {
 
 			it("addDataset: courses directory contains no valid JSON throws InsightError", async function () {
 				try {
-					await facade.addDataset(
-						"dataset",
-						invalidJSONDataset,
-						InsightDatasetKind.Sections
-					);
+					await facade.addDataset("dataset", invalidJSONDataset, InsightDatasetKind.Sections);
 					expect.fail("Should have thrown above.");
 				} catch (err) {
 					expect(err).to.be.instanceOf(InsightError);
@@ -249,11 +198,7 @@ describe("InsightFacade", function () {
 			});
 			it("addDataset: zip missing JSON with 'result' key throws InsightError", async function () {
 				try {
-					await facade.addDataset(
-						"dataset",
-						noResultKeyDataset,
-						InsightDatasetKind.Sections
-					);
+					await facade.addDataset("dataset", noResultKeyDataset, InsightDatasetKind.Sections);
 					expect.fail("Should have thrown above.");
 				} catch (err) {
 					expect(err).to.be.instanceOf(InsightError);
@@ -261,11 +206,7 @@ describe("InsightFacade", function () {
 			});
 			it("addDataset: zip with courses but no sections throws InsightError", async function () {
 				try {
-					await facade.addDataset(
-						"dataset",
-						noSectionsDataset,
-						InsightDatasetKind.Sections
-					);
+					await facade.addDataset("dataset", noSectionsDataset, InsightDatasetKind.Sections);
 					expect.fail("Should have thrown above.");
 				} catch (err) {
 					expect(err).to.be.instanceOf(InsightError);
@@ -275,9 +216,7 @@ describe("InsightFacade", function () {
 			//////// MISSING REQUIRED FIELDS IN CONTENT /////////
 			it("Dataset with invalid sections -> Invalid input missing audit", async function () {
 				try {
-					const datasetMissingAudit = await getContentFromArchives(
-						"datasetSectionMissingAudit.zip"
-					);
+					const datasetMissingAudit = await getContentFromArchives("datasetSectionMissingAudit.zip");
 					const result = await facade.addDataset(
 						"missingFieldDatasetTest",
 						datasetMissingAudit,
@@ -290,9 +229,7 @@ describe("InsightFacade", function () {
 			});
 			it("Dataset with invalid sections -> Invalid input missing Avg", async function () {
 				try {
-					const datasetMissingAvg = await getContentFromArchives(
-						"datasetSectionMissingAvg.zip"
-					);
+					const datasetMissingAvg = await getContentFromArchives("datasetSectionMissingAvg.zip");
 					const result = await facade.addDataset(
 						"missingFieldDatasetTest",
 						datasetMissingAvg,
@@ -305,9 +242,7 @@ describe("InsightFacade", function () {
 			});
 			it("Dataset with invalid sections -> Invalid input missing Course", async function () {
 				try {
-					const datasetMissingCourse = await getContentFromArchives(
-						"datasetSectionMissingCourse.zip"
-					);
+					const datasetMissingCourse = await getContentFromArchives("datasetSectionMissingCourse.zip");
 					const result = await facade.addDataset(
 						"missingFieldDatasetTest",
 						datasetMissingCourse,
@@ -320,9 +255,7 @@ describe("InsightFacade", function () {
 			});
 			it("Dataset with invalid sections -> Invalid input missing Fail", async function () {
 				try {
-					const datasetMissingFail = await getContentFromArchives(
-						"datasetSectionMissingFail.zip"
-					);
+					const datasetMissingFail = await getContentFromArchives("datasetSectionMissingFail.zip");
 					const result = await facade.addDataset(
 						"missingFieldDatasetTest",
 						datasetMissingFail,
@@ -335,9 +268,7 @@ describe("InsightFacade", function () {
 			});
 			it("Dataset with invalid sections -> Invalid input missing ID", async function () {
 				try {
-					const datasetMissingID = await getContentFromArchives(
-						"datasetSectionMissingID.zip"
-					);
+					const datasetMissingID = await getContentFromArchives("datasetSectionMissingID.zip");
 					const result = await facade.addDataset(
 						"missingFieldDatasetTest",
 						datasetMissingID,
@@ -350,9 +281,7 @@ describe("InsightFacade", function () {
 			});
 			it("Dataset with invalid sections -> Invalid input missing Pass", async function () {
 				try {
-					const datasetMissingPass = await getContentFromArchives(
-						"datasetSectionMissingPass.zip"
-					);
+					const datasetMissingPass = await getContentFromArchives("datasetSectionMissingPass.zip");
 					const result = await facade.addDataset(
 						"missingFieldDatasetTest",
 						datasetMissingPass,
@@ -365,9 +294,7 @@ describe("InsightFacade", function () {
 			});
 			it("Dataset with invalid sections -> Invalid input missing Professor", async function () {
 				try {
-					const datasetMissingProfessor = await getContentFromArchives(
-						"datasetSectionMissingProfessor.zip"
-					);
+					const datasetMissingProfessor = await getContentFromArchives("datasetSectionMissingProfessor.zip");
 					const result = await facade.addDataset(
 						"missingFieldDatasetTest",
 						datasetMissingProfessor,
@@ -380,9 +307,7 @@ describe("InsightFacade", function () {
 			});
 			it("Dataset with invalid sections -> Invalid input missing Subject", async function () {
 				try {
-					const datasetMissingSubject = await getContentFromArchives(
-						"datasetSectionMissingSubject.zip"
-					);
+					const datasetMissingSubject = await getContentFromArchives("datasetSectionMissingSubject.zip");
 					const result = await facade.addDataset(
 						"missingFieldDatasetTest",
 						datasetMissingSubject,
@@ -395,9 +320,7 @@ describe("InsightFacade", function () {
 			});
 			it("Dataset with invalid sections -> Invalid input missing Title", async function () {
 				try {
-					const datasetMissingTitle = await getContentFromArchives(
-						"datasetSectionMissingTitle.zip"
-					);
+					const datasetMissingTitle = await getContentFromArchives("datasetSectionMissingTitle.zip");
 					const result = await facade.addDataset(
 						"missingFieldDatasetTest",
 						datasetMissingTitle,
@@ -410,9 +333,7 @@ describe("InsightFacade", function () {
 			});
 			it("Dataset with invalid sections -> Invalid input missing Year", async function () {
 				try {
-					const datasetMissingYear = await getContentFromArchives(
-						"datasetSectionMissingYear.zip"
-					);
+					const datasetMissingYear = await getContentFromArchives("datasetSectionMissingYear.zip");
 					const result = await facade.addDataset(
 						"missingFieldDatasetTest",
 						datasetMissingYear,
@@ -426,11 +347,7 @@ describe("InsightFacade", function () {
 
 			it("Failure AddDataset -> Rejecting the wrong kind value", async function () {
 				try {
-					const result = await facade.addDataset(
-						"CPSC310",
-						sections,
-						InsightDatasetKind.Rooms
-					);
+					const result = await facade.addDataset("CPSC310", sections, InsightDatasetKind.Rooms);
 					return expect(result).to.eventually.be.rejectedWith(InsightError);
 				} catch (err) {
 					expect(err).to.be.instanceOf(InsightError);
@@ -439,21 +356,13 @@ describe("InsightFacade", function () {
 			it("Failure AddDataset -> Rejecting a value dataset which already exists in the db", async function () {
 				// Add the dataset, then try to add it again. This could also go in its own describe potentially
 				try {
-					const result1 = await facade.addDataset(
-						"UBCcourses",
-						sections,
-						InsightDatasetKind.Sections
-					);
+					const result1 = await facade.addDataset("UBCcourses", sections, InsightDatasetKind.Sections);
 
 					// Checking that result1 was added
 					expect(result1).to.be.an("array");
 					expect(result1[0]).to.be.a("string").and.to.equal("UBCcourses");
 
-					const result2 = await facade.addDataset(
-						"UBCcourses",
-						sections,
-						InsightDatasetKind.Sections
-					);
+					const result2 = await facade.addDataset("UBCcourses", sections, InsightDatasetKind.Sections);
 
 					return expect(result2).to.be.rejectedWith(InsightError);
 				} catch (err) {
@@ -498,11 +407,7 @@ describe("InsightFacade", function () {
 		});
 		it("Failure RemoveQuery -> Rejects when presented with a valid ID which does not exist in the db", async function () {
 			try {
-				await facade.addDataset(
-					"testDataset",
-					sections,
-					InsightDatasetKind.Sections
-				);
+				await facade.addDataset("testDataset", sections, InsightDatasetKind.Sections);
 				// Need to first add some data to the db
 				await facade.removeDataset("CPSC100");
 			} catch (err) {
@@ -512,16 +417,8 @@ describe("InsightFacade", function () {
 		it("Success RemoveQuery -> Removed item from the db corresponding to the given param id -> Multiple items exist", async function () {
 			// Add data to the db, then remove it
 			// Check that return type is a string array which still contains items, but not our item
-			await facade.addDataset(
-				"testData",
-				validDatasetOneCourse,
-				InsightDatasetKind.Sections
-			);
-			await facade.addDataset(
-				"secondDataset",
-				validDatasetOneCourse,
-				InsightDatasetKind.Sections
-			);
+			await facade.addDataset("testData", validDatasetOneCourse, InsightDatasetKind.Sections);
+			await facade.addDataset("secondDataset", validDatasetOneCourse, InsightDatasetKind.Sections);
 			const result = await facade.removeDataset("testData");
 
 			expect(result).to.be.a("string");
@@ -535,11 +432,7 @@ describe("InsightFacade", function () {
 		it("Success RemoveQuery -> Removed item from db corresponding to the given param id -> No other items exist", async function () {
 			// Add data to the db, then remove it
 			// Check that the return type is an empty string array
-			await facade.addDataset(
-				"testData",
-				validDatasetOneCourse,
-				InsightDatasetKind.Sections
-			);
+			await facade.addDataset("testData", validDatasetOneCourse, InsightDatasetKind.Sections);
 			const result = await facade.removeDataset("testData");
 
 			expect(result).to.be.a("string");
@@ -554,16 +447,8 @@ describe("InsightFacade", function () {
 			// check that the return type is a string array, and check that the disk memory no longer contains the deleted item
 			const secondFacade = new InsightFacade();
 
-			await facade.addDataset(
-				"testData",
-				validDatasetOneCourse,
-				InsightDatasetKind.Sections
-			);
-			await facade.addDataset(
-				"secondDataset",
-				validDatasetOneCourse,
-				InsightDatasetKind.Sections
-			);
+			await facade.addDataset("testData", validDatasetOneCourse, InsightDatasetKind.Sections);
+			await facade.addDataset("secondDataset", validDatasetOneCourse, InsightDatasetKind.Sections);
 			await facade.removeDataset("testData");
 
 			const result = await secondFacade.listDatasets();
@@ -583,14 +468,12 @@ describe("InsightFacade", function () {
 			if (!this.test) {
 				throw new Error(
 					"Invalid call to checkQuery." +
-					"Usage: 'checkQuery' must be passed as the second parameter of Mocha's it(..) function." +
-					"Do not invoke the function directly."
+						"Usage: 'checkQuery' must be passed as the second parameter of Mocha's it(..) function." +
+						"Do not invoke the function directly."
 				);
 			}
 			// Destructuring assignment to reduce property accesses
-			const { input, expected, errorExpected } = await loadTestQuery(
-				this.test.title
-			);
+			const { input, expected, errorExpected } = await loadTestQuery(this.test.title);
 			let result: InsightResult[];
 			try {
 				expect(input).to.be.an("object");
@@ -598,16 +481,10 @@ describe("InsightFacade", function () {
 
 				// If we get here, then performQuery did not throw error
 				const maximumResultLength = 5001;
-				expect(result).to.deep.equal(
-					expected,
-					"Query result matches expected output"
-				);
+				expect(result).to.deep.equal(expected, "Query result matches expected output");
 				expect(result).to.be.an("array");
 				expect(result.length).to.equal(expected.length);
-				expect(result.length).to.be.at.most(
-					maximumResultLength,
-					"Result size should not exceed 5000"
-				);
+				expect(result.length).to.be.at.most(maximumResultLength, "Result size should not exceed 5000");
 			} catch (err) {
 				if (!errorExpected) {
 					expect.fail(`performQuery threw unexpected error: ${err}`);
@@ -623,9 +500,7 @@ describe("InsightFacade", function () {
 			}
 			// Double-checking that performQuery didn't resolve when it should have rejected
 			if (errorExpected) {
-				expect.fail(
-					`performQuery resolved when it should have rejected with ${expected}`
-				);
+				expect.fail(`performQuery resolved when it should have rejected with ${expected}`);
 			}
 		}
 
@@ -636,19 +511,13 @@ describe("InsightFacade", function () {
 			// Will *fail* if there is a problem reading ANY dataset.
 			const loadDatasetPromises: Promise<string[]>[] = [
 				facade.addDataset("sections", sections, InsightDatasetKind.Sections),
-				facade.addDataset(
-					"validDatasetOneCourse",
-					validDatasetOneCourse,
-					InsightDatasetKind.Sections
-				),
+				facade.addDataset("validDatasetOneCourse", validDatasetOneCourse, InsightDatasetKind.Sections),
 			];
 
 			try {
 				await Promise.all(loadDatasetPromises);
 			} catch (err) {
-				throw new Error(
-					`In PerformQuery Before hook, dataset(s) failed to be added. \n${err}`
-				);
+				throw new Error(`In PerformQuery Before hook, dataset(s) failed to be added. \n${err}`);
 			}
 		});
 
@@ -664,38 +533,14 @@ describe("InsightFacade", function () {
 			it("[invalid/andEmpty.json] AND is empty", checkQuery);
 			it("[invalid/columnsEmpty.json] COLUMNS is empty", checkQuery);
 			it("[invalid/invalidFilterKey.json] Filter key is invalid", checkQuery);
-			it(
-				"[invalid/incorrectFilterType.json] Filter type is invalid",
-				checkQuery
-			);
-			it(
-				"[invalid/referencingNonExistentDataset.json] Referenced dataset DNE",
-				checkQuery
-			);
-			it(
-				"[invalid/optionsMissingColumn.json] Missing COLUMNS in OPTIONS",
-				checkQuery
-			);
-			it(
-				"[invalid/incorrectValueTypeEQ.json] EQ value is not number",
-				checkQuery
-			);
-			it(
-				"[invalid/incorrectValueTypeGT.json] GT value is not number",
-				checkQuery
-			);
-			it(
-				"[invalid/incorrectValueTypeIS.json] IS value is not number",
-				checkQuery
-			);
-			it(
-				"[invalid/incorrectValueTypeLT.json] LT value is not number",
-				checkQuery
-			);
-			it(
-				"[invalid/invalidIDString.json] idstring value is invalid",
-				checkQuery
-			);
+			it("[invalid/incorrectFilterType.json] Filter type is invalid", checkQuery);
+			it("[invalid/referencingNonExistentDataset.json] Referenced dataset DNE", checkQuery);
+			it("[invalid/optionsMissingColumn.json] Missing COLUMNS in OPTIONS", checkQuery);
+			it("[invalid/incorrectValueTypeEQ.json] EQ value is not number", checkQuery);
+			it("[invalid/incorrectValueTypeGT.json] GT value is not number", checkQuery);
+			it("[invalid/incorrectValueTypeIS.json] IS value is not number", checkQuery);
+			it("[invalid/incorrectValueTypeLT.json] LT value is not number", checkQuery);
+			it("[invalid/invalidIDString.json] idstring value is invalid", checkQuery);
 			it("[invalid/incorrectTypeIS.json] IS skey type is invalid", checkQuery);
 			it("[invalid/invalidKeyTypeEQ.json] EQ Key type is invalid", checkQuery);
 			it("[invalid/invalidKeyTypeGT.json] GT Key type is invalid", checkQuery);
@@ -705,89 +550,38 @@ describe("InsightFacade", function () {
 			it("[invalid/noKeyEQ.json] EQ missing Key", checkQuery);
 			it("[invalid/noKeyLT.json] LT missing Key", checkQuery);
 			it("[invalid/orEmpty.json] OR clause is empty", checkQuery);
-			it(
-				"[invalid/referencingMultipleDatasets.json] Referencing multiple datasets",
-				checkQuery
-			);
+			it("[invalid/referencingMultipleDatasets.json] Referencing multiple datasets", checkQuery);
 			it("[invalid/missingQueryNOT.json] NOT clause is empty", checkQuery);
 			it("[invalid/missingKeyIS.json] IS clause is empty", checkQuery);
 			it("[invalid/emptyArrayAND.json] AND array is empty", checkQuery);
 			it("[invalid/emptyArrayOR.json] OR array is empty", checkQuery);
-			it(
-				"[invalid/referencingNoDataset.json] Referencing no dataset",
-				checkQuery
-			);
-			it(
-				"[invalid/orderKeyNotInColumns.json] Order key is not in the columns array",
-				checkQuery
-			);
-			it(
-				"[invalid/returningMoreThan5000.json] More than 5000 items",
-				checkQuery
-			);
-			it(
-				"[invalid/returningEntireDataset.json] Returning many items",
-				checkQuery
-			);
-			it(
-				"[invalid/wildcardAsterisk.json] IS clause wildcard value is an asterisk",
-				checkQuery
-			);
-			it(
-				"[invalid/wildcardMiddle.json] IS clause wildcard is embedded in the word",
-				checkQuery
-			);
+			it("[invalid/referencingNoDataset.json] Referencing no dataset", checkQuery);
+			it("[invalid/orderKeyNotInColumns.json] Order key is not in the columns array", checkQuery);
+			it("[invalid/returningMoreThan5000.json] More than 5000 items", checkQuery);
+			it("[invalid/returningEntireDataset.json] Returning many items", checkQuery);
+			it("[invalid/wildcardAsterisk.json] IS clause wildcard value is an asterisk", checkQuery);
+			it("[invalid/wildcardMiddle.json] IS clause wildcard is embedded in the word", checkQuery);
 		});
 		describe("PerformQuery Success cases", function () {
-			it(
-				"[valid/returningNoResults.json] Correctly returns no results",
-				checkQuery
-			);
-			it(
-				"[valid/nestingLogicFilters.json] Correctly uses nested logic",
-				checkQuery
-			);
-			it(
-				"[valid/usingAllRequiredQueryParams.json] Correctly uses all required query parameters",
-				checkQuery
-			);
-			it(
-				"[valid/capsSensitivity.json] Testing for caps sensitivity",
-				checkQuery
-			);
-			it(
-				"[valid/threeFilters.json] Testing when using three filters",
-				checkQuery
-			);
+			it("[valid/returningNoResults.json] Correctly returns no results", checkQuery);
+			it("[valid/nestingLogicFilters.json] Correctly uses nested logic", checkQuery);
+			it("[valid/usingAllRequiredQueryParams.json] Correctly uses all required query parameters", checkQuery);
+			it("[valid/capsSensitivity.json] Testing for caps sensitivity", checkQuery);
+			it("[valid/threeFilters.json] Testing when using three filters", checkQuery);
 			it("[valid/twoFilters.json] Testing when using two filters", checkQuery);
 			it("[valid/usingEQ.json] Testing EQ Operator success", checkQuery);
 			it("[valid/usingID.json] Testing ID Operator success", checkQuery);
-			it(
-				"[valid/usingInstructor.json] Testing using instructor column",
-				checkQuery
-			);
-			it(
-				"[valid/orderingWithSkey.json] Testing using skey for ORDER",
-				checkQuery
-			);
+			it("[valid/usingInstructor.json] Testing using instructor column", checkQuery);
+			it("[valid/orderingWithSkey.json] Testing using skey for ORDER", checkQuery);
 			it("[valid/usingLT.json] Testing using LT operator", checkQuery);
 			it("[valid/usingOR.json] Testing using OR operator", checkQuery);
 			it("[valid/usingNOT.json] Testing using NOT operator", checkQuery);
 			it("[valid/usingUUID.json] Testing using uuid column", checkQuery);
 			it("[valid/wildcardLeft.json] Testing using wildcard left", checkQuery);
 			it("[valid/wildcardRight.json] Testing using wildcard right", checkQuery);
-			it(
-				"[valid/wildcardNoString.json] Testing using wildcard with no string",
-				checkQuery
-			);
-			it(
-				"[valid/wildcardLeftRight.json] Testing using wildcard left and right",
-				checkQuery
-			);
-			it(
-				"[valid/returning4999.json] Testing upper limit of array return",
-				checkQuery
-			);
+			it("[valid/wildcardNoString.json] Testing using wildcard with no string", checkQuery);
+			it("[valid/wildcardLeftRight.json] Testing using wildcard left and right", checkQuery);
+			it("[valid/returning4999.json] Testing upper limit of array return", checkQuery);
 		});
 	});
 	describe("ListDatasets", function () {
@@ -811,11 +605,7 @@ describe("InsightFacade", function () {
 		it("Success ListDatasets -> listDatasets: sections dataset", async function () {
 			try {
 				const sectionsRowCount = 64612;
-				await facade.addDataset(
-					"sections",
-					sections,
-					InsightDatasetKind.Sections
-				);
+				await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
 				const res = await facade.listDatasets();
 				expect(res).to.be.an("array");
 				expect(res.length).to.equal(1);
@@ -842,16 +632,8 @@ describe("InsightFacade", function () {
 			];
 			const expectedLength = expectedResult.length;
 
-			await facade.addDataset(
-				"testData",
-				validDatasetOneCourse,
-				InsightDatasetKind.Sections
-			);
-			await facade.addDataset(
-				"newData",
-				validDatasetOneCourse,
-				InsightDatasetKind.Sections
-			);
+			await facade.addDataset("testData", validDatasetOneCourse, InsightDatasetKind.Sections);
+			await facade.addDataset("newData", validDatasetOneCourse, InsightDatasetKind.Sections);
 			const result = await facade.listDatasets();
 
 			expect(result).to.be.an("array");
@@ -872,11 +654,7 @@ describe("InsightFacade", function () {
 		it("Failure ListDatasets -> When there are items, but one or more of them is missing id, kind of row number", async function () {
 			try {
 				const requiredFields = ["id", "kind", "numRows"];
-				await facade.addDataset(
-					"TestInput",
-					sections,
-					InsightDatasetKind.Sections
-				);
+				await facade.addDataset("TestInput", sections, InsightDatasetKind.Sections);
 				const result = await facade.listDatasets();
 
 				expect(result).to.be.an("array");
