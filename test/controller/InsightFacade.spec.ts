@@ -26,16 +26,24 @@ describe("InsightFacade", function () {
 
 	// Declare datasets used in tests. You should add more datasets like this!
 	let sections: string;
-	let emptyDataset: string;
 	let validDatasetOneCourse: string;
+	let noCoursesDirDataset: string;
+	let invalidJSONDataset: string;
+	let noResultKeyDataset: string;
+	let noSectionsDataset: string;
+	// let audit1to5001Dataset: string;
 
 	before(async function () {
 		// This block runs once and loads the datasets.
 		sections = await getContentFromArchives("pair.zip");
-		emptyDataset = await getContentFromArchives("emptyDataset.zip");
 		validDatasetOneCourse = await getContentFromArchives(
 			"validDatasetOneCourse.zip"
 		);
+		noCoursesDirDataset = await getContentFromArchives("noCoursesDir.zip");
+		invalidJSONDataset = await getContentFromArchives("invalidJSON.zip");
+		noResultKeyDataset = await getContentFromArchives("noResultKey.zip");
+		noSectionsDataset = await getContentFromArchives("noSections.zip");
+		// audit1to5001Dataset = await getContentFromArchives("audit-1-to-5001.zip");
 		// Just in case there is anything hanging around from a previous run of the test suite
 		await clearDisk();
 	});
@@ -93,7 +101,6 @@ describe("InsightFacade", function () {
 			const testIDs = ["TESTid", "testID"];
 			const expectedDatasetCount = testIDs.length;
 
-			//TODO replace sections with smaller file
 			await facade.addDataset(
 				testIDs[0],
 				sections,
@@ -111,6 +118,7 @@ describe("InsightFacade", function () {
 				expect(testIDs).to.include(id);
 			});
 		});
+
 		it("Success AddDataset -> Allows adding section where all string fields are empty", async function () {
 			const validEmptyStringFields = await getContentFromArchives(
 				"validEmptyStringFields.zip"
@@ -153,85 +161,119 @@ describe("InsightFacade", function () {
 			});
 		});
 		describe("Failure Cases", function () {
-			it("Failure AddDataset -> should reject with an empty dataset id", async function () {
+
+			/////// ID INPUT FAILURE CASES ///////
+			it("addDataset: empty id throws InsightError", async function () {
 				try {
-					const result = await facade.addDataset(
-						"",
-						sections,
-						InsightDatasetKind.Sections
-					);
-					return expect(result).to.eventually.be.rejectedWith(InsightError);
+					await facade.addDataset("", sections, InsightDatasetKind.Sections);
+					expect.fail("Should have thrown above.");
 				} catch (err) {
 					expect(err).to.be.instanceOf(InsightError);
 				}
 			});
-			it("Failure AddDataset -> Rejecting with id being only whitespace", async function () {
+
+			it("addDataset: id with underscore throws InsightError", async function () {
 				try {
-					const result = await facade.addDataset(
-						"  ",
-						sections,
-						InsightDatasetKind.Sections
-					);
-					return expect(result).to.eventually.be.rejectedWith(InsightError);
-				} catch (err) {
-					expect(err).to.be.instanceOf(InsightError);
-				}
-			});
-			it("Failure AddDataset -> Rejecting id which contains an underscore", async function () {
-				try {
-					const result = await facade.addDataset(
+					await facade.addDataset(
 						"invalid_id",
 						sections,
 						InsightDatasetKind.Sections
 					);
-					return expect(result).to.eventually.be.rejectedWith(InsightError);
+					expect.fail("Should have thrown above.");
 				} catch (err) {
 					expect(err).to.be.instanceOf(InsightError);
 				}
 			});
-			it("Failure AddDataset -> Rejecting a non base64 content string", async function () {
+
+			it("addDataset: whitespace only id throws InsightError", async function () {
 				try {
-					const content = "invalid_content";
-					const result = await facade.addDataset(
-						"CPSC310",
-						content,
+					await facade.addDataset(" ", sections, InsightDatasetKind.Sections);
+					expect.fail("Should have thrown above.");
+				} catch (err) {
+					expect(err).to.be.instanceOf(InsightError);
+				}
+			});
+
+			it("addDataset: duplicate id throws InsightError", async function () {
+				try {
+					await facade.addDataset(
+						"dataset",
+						sections,
 						InsightDatasetKind.Sections
 					);
-					return expect(result).to.eventually.be.rejectedWith(InsightError);
-				} catch (err) {
-					expect(err).to.be.instanceOf(InsightError);
-				}
-			});
-			it("Failure AddDataset -> Empty Dataset -> Invalid input", async function () {
-				// Results array is empty
-				try {
-					const result = await facade.addDataset(
-						"emptyDatasetTest",
-						emptyDataset,
+					await facade.addDataset(
+						"dataset",
+						sections,
 						InsightDatasetKind.Sections
 					);
-					return expect(result).to.be.rejectedWith(InsightError);
+					expect.fail("Should have thrown above.");
 				} catch (err) {
 					expect(err).to.be.instanceOf(InsightError);
 				}
 			});
-			it("Failure AddDataset -> Dataset with no sections -> Invalid input", async function () {
-				// Results array is empty
+
+			/////// INVALID CONTENT ////////
+			it("addDataset: invalid base64 string throws InsightError", async function () {
 				try {
-					const datasetNoSection = await getContentFromArchives(
-						"datasetNoSection.zip"
-					);
-					const result = await facade.addDataset(
-						"emptyDatasetTest",
-						datasetNoSection,
+					await facade.addDataset("dataset", "?", InsightDatasetKind.Sections);
+					expect.fail("Should have thrown above.");
+				} catch (err) {
+					expect(err).to.be.instanceOf(InsightError);
+				}
+			});
+
+			it("addDataset: zip's root directory has no 'courses' dir throws InsightError", async function () {
+				try {
+					await facade.addDataset(
+						"dataset",
+						noCoursesDirDataset,
 						InsightDatasetKind.Sections
 					);
-					return expect(result).to.be.rejectedWith(InsightError);
+					expect.fail("Should have thrown above.");
 				} catch (err) {
 					expect(err).to.be.instanceOf(InsightError);
 				}
 			});
-			it("Failure AddDataset -> Dataset with invalid sections -> Invalid input missing audit", async function () {
+
+			it("addDataset: courses directory contains no valid JSON throws InsightError", async function () {
+				try {
+					await facade.addDataset(
+						"dataset",
+						invalidJSONDataset,
+						InsightDatasetKind.Sections
+					);
+					expect.fail("Should have thrown above.");
+				} catch (err) {
+					expect(err).to.be.instanceOf(InsightError);
+				}
+			});
+			it("addDataset: zip missing JSON with 'result' key throws InsightError", async function () {
+				try {
+					await facade.addDataset(
+						"dataset",
+						noResultKeyDataset,
+						InsightDatasetKind.Sections
+					);
+					expect.fail("Should have thrown above.");
+				} catch (err) {
+					expect(err).to.be.instanceOf(InsightError);
+				}
+			});
+			it("addDataset: zip with courses but no sections throws InsightError", async function () {
+				try {
+					await facade.addDataset(
+						"dataset",
+						noSectionsDataset,
+						InsightDatasetKind.Sections
+					);
+					expect.fail("Should have thrown above.");
+				} catch (err) {
+					expect(err).to.be.instanceOf(InsightError);
+				}
+			});
+
+			//////// MISSING REQUIRED FIELDS IN CONTENT /////////
+			it("Dataset with invalid sections -> Invalid input missing audit", async function () {
 				try {
 					const datasetMissingAudit = await getContentFromArchives(
 						"datasetSectionMissingAudit.zip"
@@ -246,7 +288,7 @@ describe("InsightFacade", function () {
 					expect(err).to.be.instanceOf(InsightError);
 				}
 			});
-			it("Failure AddDataset -> Dataset with invalid sections -> Invalid input missing Avg", async function () {
+			it("Dataset with invalid sections -> Invalid input missing Avg", async function () {
 				try {
 					const datasetMissingAvg = await getContentFromArchives(
 						"datasetSectionMissingAvg.zip"
@@ -261,7 +303,7 @@ describe("InsightFacade", function () {
 					expect(err).to.be.instanceOf(InsightError);
 				}
 			});
-			it("Failure AddDataset -> Dataset with invalid sections -> Invalid input missing Course", async function () {
+			it("Dataset with invalid sections -> Invalid input missing Course", async function () {
 				try {
 					const datasetMissingCourse = await getContentFromArchives(
 						"datasetSectionMissingCourse.zip"
@@ -276,7 +318,7 @@ describe("InsightFacade", function () {
 					expect(err).to.be.instanceOf(InsightError);
 				}
 			});
-			it("Failure AddDataset -> Dataset with invalid sections -> Invalid input missing Fail", async function () {
+			it("Dataset with invalid sections -> Invalid input missing Fail", async function () {
 				try {
 					const datasetMissingFail = await getContentFromArchives(
 						"datasetSectionMissingFail.zip"
@@ -291,7 +333,7 @@ describe("InsightFacade", function () {
 					expect(err).to.be.instanceOf(InsightError);
 				}
 			});
-			it("Failure AddDataset -> Dataset with invalid sections -> Invalid input missing ID", async function () {
+			it("Dataset with invalid sections -> Invalid input missing ID", async function () {
 				try {
 					const datasetMissingID = await getContentFromArchives(
 						"datasetSectionMissingID.zip"
@@ -306,7 +348,7 @@ describe("InsightFacade", function () {
 					expect(err).to.be.instanceOf(InsightError);
 				}
 			});
-			it("Failure AddDataset -> Dataset with invalid sections -> Invalid input missing Pass", async function () {
+			it("Dataset with invalid sections -> Invalid input missing Pass", async function () {
 				try {
 					const datasetMissingPass = await getContentFromArchives(
 						"datasetSectionMissingPass.zip"
@@ -321,7 +363,7 @@ describe("InsightFacade", function () {
 					expect(err).to.be.instanceOf(InsightError);
 				}
 			});
-			it("Failure AddDataset -> Dataset with invalid sections -> Invalid input missing Professor", async function () {
+			it("Dataset with invalid sections -> Invalid input missing Professor", async function () {
 				try {
 					const datasetMissingProfessor = await getContentFromArchives(
 						"datasetSectionMissingProfessor.zip"
@@ -336,7 +378,7 @@ describe("InsightFacade", function () {
 					expect(err).to.be.instanceOf(InsightError);
 				}
 			});
-			it("Failure AddDataset -> Dataset with invalid sections -> Invalid input missing Subject", async function () {
+			it("Dataset with invalid sections -> Invalid input missing Subject", async function () {
 				try {
 					const datasetMissingSubject = await getContentFromArchives(
 						"datasetSectionMissingSubject.zip"
@@ -351,7 +393,7 @@ describe("InsightFacade", function () {
 					expect(err).to.be.instanceOf(InsightError);
 				}
 			});
-			it("Failure AddDataset -> Dataset with invalid sections -> Invalid input missing Title", async function () {
+			it("Dataset with invalid sections -> Invalid input missing Title", async function () {
 				try {
 					const datasetMissingTitle = await getContentFromArchives(
 						"datasetSectionMissingTitle.zip"
@@ -366,7 +408,7 @@ describe("InsightFacade", function () {
 					expect(err).to.be.instanceOf(InsightError);
 				}
 			});
-			it("Failure AddDataset -> Dataset with invalid sections -> Invalid input missing Year", async function () {
+			it("Dataset with invalid sections -> Invalid input missing Year", async function () {
 				try {
 					const datasetMissingYear = await getContentFromArchives(
 						"datasetSectionMissingYear.zip"
@@ -381,20 +423,7 @@ describe("InsightFacade", function () {
 					expect(err).to.be.instanceOf(InsightError);
 				}
 			});
-			it("Failure AddDataset -> Content results name is invalid", async function () {
-				try {
-					const invalidContentName = await getContentFromArchives(
-						"invalidContentResultName.zip"
-					);
-					await facade.addDataset(
-						"invalidContentTest",
-						invalidContentName,
-						InsightDatasetKind.Sections
-					);
-				} catch (err) {
-					expect(err).to.be.instanceOf(InsightError);
-				}
-			});
+
 			it("Failure AddDataset -> Rejecting the wrong kind value", async function () {
 				try {
 					const result = await facade.addDataset(
@@ -438,7 +467,6 @@ describe("InsightFacade", function () {
 		beforeEach(function () {
 			// New instance of InsightFacade
 			facade = new InsightFacade();
-			// TODO: Can also just load in one dataset here
 		});
 		afterEach(async function () {
 			// So that InsightFacade is reset for each test
@@ -771,29 +799,33 @@ describe("InsightFacade", function () {
 			// So that InsightFacade is reset for each test
 			await clearDisk();
 		});
-
-		it("Success ListDatasets -> returns an empty array if no datasets have been added", async function () {
-			const result = await facade.listDatasets();
-
-			expect(result).to.be.an("array");
-			expect(result).to.have.lengthOf(0);
+		it("Success ListDatasets -> listDatasets: no datasets", async function () {
+			try {
+				const res = await facade.listDatasets();
+				expect(res).to.be.an("array");
+				expect(res.length).to.equal(0);
+			} catch (err) {
+				expect.fail(err, "No datasets should have been listed");
+			}
 		});
-		it("Success ListDatasets -> When there is only one dataset added", async function () {
-			// Add one item then test
-			// Also test that each element of the array is an object which has ID, kind and overall row number in the dataset
+		it("Success ListDatasets -> listDatasets: sections dataset", async function () {
+			try {
+				const sectionsRowCount = 64612;
+				await facade.addDataset(
+					"sections",
+					sections,
+					InsightDatasetKind.Sections
+				);
+				const res = await facade.listDatasets();
+				expect(res).to.be.an("array");
+				expect(res.length).to.equal(1);
 
-			await facade.addDataset(
-				"testData",
-				validDatasetOneCourse,
-				InsightDatasetKind.Sections
-			);
-			const result = await facade.listDatasets();
-
-			expect(result).to.be.an("array");
-			expect(result).to.have.lengthOf(1);
-			result.forEach((item) => {
-				expect(item).to.be.an("object");
-			});
+				expect(res[0].id).to.equal("sections");
+				expect(res[0].kind).to.equal(InsightDatasetKind.Sections);
+				expect(res[0].numRows).to.equal(sectionsRowCount);
+			} catch (err) {
+				expect.fail(err, "sections dataset should have been listed");
+			}
 		});
 		it("Success ListDatasets -> When there are multiple datasets added", async function () {
 			const expectedResult = [
@@ -838,7 +870,6 @@ describe("InsightFacade", function () {
 		});
 
 		it("Failure ListDatasets -> When there are items, but one or more of them is missing id, kind of row number", async function () {
-			// TODO
 			try {
 				const requiredFields = ["id", "kind", "numRows"];
 				await facade.addDataset(
