@@ -1,15 +1,12 @@
 {
-	"title": "Incorrect type IS",
+	"title": "Body has invalid filter key",
 	"input": {
 		"WHERE": {
-			"IS": {
-				"sections_id": 100
-			}
+			"BAD": {}
 		},
 		"OPTIONS": {
 			"COLUMNS": [
-				"sections_avg",
-				"sections_id"
+				"sections_avg"
 			]
 		}
 	},

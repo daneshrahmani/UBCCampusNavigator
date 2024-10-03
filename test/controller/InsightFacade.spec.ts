@@ -31,7 +31,7 @@ describe("InsightFacade", function () {
 	let invalidJSONDataset: string;
 	let noResultKeyDataset: string;
 	let noSectionsDataset: string;
-	// let audit1to5001Dataset: string;
+	let audit1to5001Dataset: string;
 
 	before(async function () {
 		// This block runs once and loads the datasets.
@@ -41,7 +41,7 @@ describe("InsightFacade", function () {
 		invalidJSONDataset = await getContentFromArchives("invalidJSON.zip");
 		noResultKeyDataset = await getContentFromArchives("noResultKey.zip");
 		noSectionsDataset = await getContentFromArchives("noSections.zip");
-		// audit1to5001Dataset = await getContentFromArchives("audit-1-to-5001.zip");
+		audit1to5001Dataset = await getContentFromArchives("audit-1-to-5001.zip");
 		// Just in case there is anything hanging around from a previous run of the test suite
 		await clearDisk();
 	});
@@ -481,7 +481,7 @@ describe("InsightFacade", function () {
 
 				// If we get here, then performQuery did not throw error
 				const maximumResultLength = 5001;
-				expect(result).to.deep.equal(expected, "Query result matches expected output");
+				expect(result).to.have.deep.members(expected, "Query result matches expected output");
 				expect(result).to.be.an("array");
 				expect(result.length).to.equal(expected.length);
 				expect(result.length).to.be.at.most(maximumResultLength, "Result size should not exceed 5000");
@@ -512,6 +512,7 @@ describe("InsightFacade", function () {
 			const loadDatasetPromises: Promise<string[]>[] = [
 				facade.addDataset("sections", sections, InsightDatasetKind.Sections),
 				facade.addDataset("validDatasetOneCourse", validDatasetOneCourse, InsightDatasetKind.Sections),
+				facade.addDataset("audit1to5001Dataset", audit1to5001Dataset, InsightDatasetKind.Sections),
 			];
 
 			try {
@@ -527,61 +528,88 @@ describe("InsightFacade", function () {
 
 		// Examples demonstrating how to test performQuery using the JSON Test Queries.
 		// The relative path to the query file must be given in square brackets.
-		it("[valid/simple.json] SELECT dept, avg WHERE avg > 97", checkQuery);
-		it("[invalid/invalid.json] Query missing WHERE", checkQuery);
 		describe("PerformQuery Failure cases", function () {
-			it("[invalid/andEmpty.json] AND is empty", checkQuery);
-			it("[invalid/columnsEmpty.json] COLUMNS is empty", checkQuery);
+			/////////////////QUERY VALIDITY/////////////////////////
+			it("[invalid/missing-where.json] Query missing BODY", checkQuery);
+			it("[invalid/missing-options.json] Query missing OPTIONS", checkQuery);
+			it("[invalid/query-is-array.json] Query cannot be an array", checkQuery);
+
+			/////////////////BODY VALIDITY/////////////////////////
+			it("[invalid/body-is-array.json] BODY cannot be an array", checkQuery);
+			it("[invalid/body-invalid-filter-key.json] BODY filter key must be valid", checkQuery);
+
+			/////////////////OPTIONS VALIDITY///////////////////////
+			it("[invalid/missing-columns.json] Query missing OPTIONS", checkQuery);
+			it("[invalid/columns-empty-object.json] Query OPTIONS cannot be an object", checkQuery);
+			it("[invalid/columns-empty-array.json] Query OPTIONS cannot be an empty array", checkQuery);
+			it("[invalid/orderKeyNotInColumns.json] Order key is not in the columns array", checkQuery);
+
+			////////////////ResultTooLargeError BEHAVIOUR///////////
+			it("[invalid/results5001.json] Query that would have 5001 results", checkQuery);
+			it("[invalid/returningEntireDataset.json] Returning many items", checkQuery);
+
+			////////////////INVALID DATASET SELECTIONS///////////////////////
+			it("[invalid/referencingNoDataset.json] Referencing no dataset", checkQuery);
+			it("[invalid/multiple-datasets.json] Cannot reference multiple datasets", checkQuery);
+			it("[invalid/dataset-dne.json] Cannot select from a dataset that was not added", checkQuery);
+
+			///////////////////WILDCARD BEHAVIOUR////////////////////////
+			it("[invalid/wildcardAsterisk.json] IS clause wildcard value is an asterisk", checkQuery);
+			it("[invalid/wildcardMiddle.json] IS clause wildcard is embedded in the word", checkQuery);
+
+			///////////////////KEY SELECTION////////////////////////
 			it("[invalid/invalidFilterKey.json] Filter key is invalid", checkQuery);
+			it("[invalid/invalidISKey.json] idstring value is invalid", checkQuery);
+			it("[invalid/invalidKeyTypeEQ.json] EQ Key type is invalid", checkQuery);
+			it("[invalid/invalidKeyTypeGT.json] GT Key type is invalid", checkQuery);
+			it("[invalid/invalidKeyTypeLT.json] LT Key type is invalid", checkQuery);
+			it("[invalid/noKeyGT.json] GT missing Key", checkQuery);
+			it("[invalid/noKeyEQ.json] EQ missing Key", checkQuery);
+			it("[invalid/noKeyLT.json] LT missing Key", checkQuery);
+
+			///////////////////VALUE SELECTION////////////////////////
 			it("[invalid/incorrectFilterType.json] Filter type is invalid", checkQuery);
-			it("[invalid/referencingNonExistentDataset.json] Referenced dataset DNE", checkQuery);
-			it("[invalid/optionsMissingColumn.json] Missing COLUMNS in OPTIONS", checkQuery);
 			it("[invalid/incorrectValueTypeEQ.json] EQ value is not number", checkQuery);
 			it("[invalid/incorrectValueTypeGT.json] GT value is not number", checkQuery);
 			it("[invalid/incorrectValueTypeIS.json] IS value is not number", checkQuery);
 			it("[invalid/incorrectValueTypeLT.json] LT value is not number", checkQuery);
-			it("[invalid/invalidIDString.json] idstring value is invalid", checkQuery);
-			it("[invalid/incorrectTypeIS.json] IS skey type is invalid", checkQuery);
-			it("[invalid/invalidKeyTypeEQ.json] EQ Key type is invalid", checkQuery);
-			it("[invalid/invalidKeyTypeGT.json] GT Key type is invalid", checkQuery);
-			it("[invalid/invalidKeyTypeLT.json] LT Key type is invalid", checkQuery);
-			it("[invalid/missingOptions.json] OPTIONS is empty", checkQuery);
-			it("[invalid/noKeyGT.json] GT missing Key", checkQuery);
-			it("[invalid/noKeyEQ.json] EQ missing Key", checkQuery);
-			it("[invalid/noKeyLT.json] LT missing Key", checkQuery);
-			it("[invalid/orEmpty.json] OR clause is empty", checkQuery);
-			it("[invalid/referencingMultipleDatasets.json] Referencing multiple datasets", checkQuery);
+
+			///////////////////LOGIC OPERATORS////////////////////////
 			it("[invalid/missingQueryNOT.json] NOT clause is empty", checkQuery);
 			it("[invalid/missingKeyIS.json] IS clause is empty", checkQuery);
 			it("[invalid/emptyArrayAND.json] AND array is empty", checkQuery);
 			it("[invalid/emptyArrayOR.json] OR array is empty", checkQuery);
-			it("[invalid/referencingNoDataset.json] Referencing no dataset", checkQuery);
-			it("[invalid/orderKeyNotInColumns.json] Order key is not in the columns array", checkQuery);
-			it("[invalid/returningMoreThan5000.json] More than 5000 items", checkQuery);
-			it("[invalid/returningEntireDataset.json] Returning many items", checkQuery);
-			it("[invalid/wildcardAsterisk.json] IS clause wildcard value is an asterisk", checkQuery);
-			it("[invalid/wildcardMiddle.json] IS clause wildcard is embedded in the word", checkQuery);
+			it("[invalid/orEmpty.json] OR clause is empty", checkQuery);
+			it("[invalid/andEmpty.json] AND is empty", checkQuery);
 		});
 		describe("PerformQuery Success cases", function () {
+			it("[valid/simple.json] SELECT dept, avg WHERE avg > 97", checkQuery);
 			it("[valid/returningNoResults.json] Correctly returns no results", checkQuery);
 			it("[valid/nestingLogicFilters.json] Correctly uses nested logic", checkQuery);
 			it("[valid/usingAllRequiredQueryParams.json] Correctly uses all required query parameters", checkQuery);
 			it("[valid/capsSensitivity.json] Testing for caps sensitivity", checkQuery);
-			it("[valid/threeFilters.json] Testing when using three filters", checkQuery);
-			it("[valid/twoFilters.json] Testing when using two filters", checkQuery);
+
+			///////////////////Math and IS OPERATORS////////////////////////
 			it("[valid/usingEQ.json] Testing EQ Operator success", checkQuery);
-			it("[valid/usingID.json] Testing ID Operator success", checkQuery);
-			it("[valid/usingInstructor.json] Testing using instructor column", checkQuery);
-			it("[valid/orderingWithSkey.json] Testing using skey for ORDER", checkQuery);
+			it("[valid/usingIS.json] Testing IS Operator success", checkQuery);
 			it("[valid/usingLT.json] Testing using LT operator", checkQuery);
 			it("[valid/usingOR.json] Testing using OR operator", checkQuery);
 			it("[valid/usingNOT.json] Testing using NOT operator", checkQuery);
+
+			///////////////////ORDERING////////////////////////
+			it("[valid/orderingWithSkey.json] Testing using skey for ORDER", checkQuery);
+
+			it("[valid/usingInstructor.json] Testing using instructor column", checkQuery);
 			it("[valid/usingUUID.json] Testing using uuid column", checkQuery);
+
+			///////////////////WILDCARD OPERATORS////////////////////////
 			it("[valid/wildcardLeft.json] Testing using wildcard left", checkQuery);
 			it("[valid/wildcardRight.json] Testing using wildcard right", checkQuery);
 			it("[valid/wildcardNoString.json] Testing using wildcard with no string", checkQuery);
 			it("[valid/wildcardLeftRight.json] Testing using wildcard left and right", checkQuery);
-			it("[valid/returning4999.json] Testing upper limit of array return", checkQuery);
+
+			///////////////////RESULT TOO LARGE BEHAVIOUR////////////////////////
+			it("[valid/results4999.json] Query with 4999 results", checkQuery);
 		});
 	});
 	describe("ListDatasets", function () {

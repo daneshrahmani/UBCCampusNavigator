@@ -1,0 +1,11 @@
+{
+	"title": "Query where COLUMNS is empty array",
+	"input": {
+		"WHERE": {},
+		"OPTIONS": {
+			"COLUMNS": []
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

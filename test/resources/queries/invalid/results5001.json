@@ -1,0 +1,18 @@
+{
+	"title": "SELECT audit WHERE audit < 5002",
+	"input": {
+		"WHERE": {
+			"LT": {
+				"audit1to5001Dataset_audit": 5002
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"audit1to5001Dataset_audit"
+			],
+			"ORDER": "audit1to5001Dataset_audit"
+		}
+	},
+	"errorExpected": true,
+	"expected": "ResultTooLargeError"
+}
