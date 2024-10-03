@@ -1,4 +1,5 @@
 import Section from "../utils/Section";
+import { addDatasetParameterValidity } from "../utils/addDatasetHelpers";
 import { IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, InsightResult } from "./IInsightFacade";
 import JSZip from "jszip";
 
@@ -10,18 +11,7 @@ import JSZip from "jszip";
 export default class InsightFacade implements IInsightFacade {
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		// TODO: Remove this once you implement the methods!
-
-		// RegExp from ChatGPT
-		const validIDRegExp = /^(?!.*_)(?=.*\S).+$/;
-
-		if (!validIDRegExp.test(id)) {
-			throw new InsightError("Invalid ID");
-		}
-
-		// To be removed in a later checkpoint
-		if (kind != InsightDatasetKind.Sections) {
-			throw new InsightError("Unsupported DatasetKind (for now");
-		}
+		addDatasetParameterValidity(id, kind);
 
 		let data: JSZip;
 

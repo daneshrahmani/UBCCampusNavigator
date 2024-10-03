@@ -1,6 +1,6 @@
 import { InsightError } from "../controller/IInsightFacade";
 
-type SectionDataObject = {
+interface SectionDataObject {
 	id: number;
 	Course: string;
 	Title: string;
@@ -12,7 +12,7 @@ type SectionDataObject = {
 	Fail: number;
 	Audit: number;
 	[key: string]: any;
-};
+}
 
 export default class Section {
 	private readonly uuid: string; // unique id of section
