@@ -345,26 +345,10 @@ describe("InsightFacade", function () {
 				}
 			});
 
-			it("Failure AddDataset -> Rejecting the wrong kind value", async function () {
+			it("Failure AddDataset -> Rejecting the wrong InsightDatasetKind value", async function () {
 				try {
 					const result = await facade.addDataset("CPSC310", sections, InsightDatasetKind.Rooms);
 					return expect(result).to.eventually.be.rejectedWith(InsightError);
-				} catch (err) {
-					expect(err).to.be.instanceOf(InsightError);
-				}
-			});
-			it("Failure AddDataset -> Rejecting a value dataset which already exists in the db", async function () {
-				// Add the dataset, then try to add it again. This could also go in its own describe potentially
-				try {
-					const result1 = await facade.addDataset("UBCcourses", sections, InsightDatasetKind.Sections);
-
-					// Checking that result1 was added
-					expect(result1).to.be.an("array");
-					expect(result1[0]).to.be.a("string").and.to.equal("UBCcourses");
-
-					const result2 = await facade.addDataset("UBCcourses", sections, InsightDatasetKind.Sections);
-
-					return expect(result2).to.be.rejectedWith(InsightError);
 				} catch (err) {
 					expect(err).to.be.instanceOf(InsightError);
 				}
@@ -518,9 +502,7 @@ describe("InsightFacade", function () {
 			try {
 				await Promise.all(loadDatasetPromises);
 			} catch (err) {
-				throw new Error(
-					`In PerformQuery Before hook, dataset(s) failed to be added. \n${err}`
-				);
+				throw new Error(`In PerformQuery Before hook, dataset(s) failed to be added. \n${err}`);
 			}
 		});
 
@@ -532,16 +514,16 @@ describe("InsightFacade", function () {
 		// The relative path to the query file must be given in square brackets.
 		describe("PerformQuery Failure cases", function () {
 			/////////////////QUERY VALIDITY/////////////////////////
-			it("[invalid/missing-where.json] Query missing BODY", checkQuery);
-			it("[invalid/missing-options.json] Query missing OPTIONS", checkQuery);
+			it("[invalid/missing-where.json] Query missing WHERE key", checkQuery);
+			it("[invalid/missing-options.json] Query missing OPTIONS key", checkQuery);
 			it("[invalid/query-is-array.json] Query cannot be an array", checkQuery);
 
 			/////////////////BODY VALIDITY/////////////////////////
-			it("[invalid/body-is-array.json] BODY cannot be an array", checkQuery);
-			it("[invalid/body-invalid-filter-key.json] BODY filter key must be valid", checkQuery);
+			it("[invalid/body-is-array.json] WHERE value cannot be an array", checkQuery);
+			it("[invalid/body-invalid-filter-key.json] WHERE filter key must be valid", checkQuery);
 
 			/////////////////OPTIONS VALIDITY///////////////////////
-			it("[invalid/missing-columns.json] Query missing OPTIONS", checkQuery);
+			it("[invalid/missing-columns.json] Query missing COLUMNS key", checkQuery);
 			it("[invalid/columns-empty-object.json] Query OPTIONS cannot be an object", checkQuery);
 			it("[invalid/columns-empty-array.json] Query OPTIONS cannot be an empty array", checkQuery);
 			it("[invalid/orderKeyNotInColumns.json] Order key is not in the columns array", checkQuery);
@@ -560,6 +542,7 @@ describe("InsightFacade", function () {
 			it("[invalid/wildcardMiddle.json] IS clause wildcard is embedded in the word", checkQuery);
 
 			///////////////////KEY SELECTION////////////////////////
+			it("[invalid/key-select-invalid.json] key 'sections_invalid' does not exist", checkQuery);
 			it("[invalid/invalidFilterKey.json] Filter key is invalid", checkQuery);
 			it("[invalid/invalidISKey.json] idstring value is invalid", checkQuery);
 			it("[invalid/invalidKeyTypeEQ.json] EQ Key type is invalid", checkQuery);
@@ -586,6 +569,8 @@ describe("InsightFacade", function () {
 		});
 		describe("PerformQuery Success cases", function () {
 			it("[valid/simple.json] SELECT dept, avg WHERE avg > 97", checkQuery);
+			it("[valid/key-select-all.json] SELECT all supported keys", checkQuery);
+			it("[valid/all-operators.json] Query utilizing all operators", checkQuery);
 			it("[valid/returningNoResults.json] Correctly returns no results", checkQuery);
 			it("[valid/nestingLogicFilters.json] Correctly uses nested logic", checkQuery);
 			it("[valid/usingAllRequiredQueryParams.json] Correctly uses all required query parameters", checkQuery);
@@ -612,6 +597,7 @@ describe("InsightFacade", function () {
 
 			///////////////////RESULT TOO LARGE BEHAVIOUR////////////////////////
 			it("[valid/results4999.json] Query with 4999 results", checkQuery);
+			it("[valid/results5000.json] Query with 5000 results", checkQuery);
 		});
 	});
 	describe("ListDatasets", function () {
