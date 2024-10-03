@@ -18,7 +18,7 @@ export default class InsightFacade implements IInsightFacade {
 		try {
 			data = await JSZip.loadAsync(content, { base64: true });
 		} catch (err) {
-			throw new InsightError("Invalid base64 string");
+			throw new InsightError(`Invalid base64 string: ${err instanceof Error ? err.message : String(err)}`);
 		}
 
 		const sections: Section[] = [];
@@ -32,7 +32,7 @@ export default class InsightFacade implements IInsightFacade {
 							for (const sectionData of JSON.parse(value).result) {
 								sections.push(new Section(sectionData));
 							}
-						} catch (e) {
+						} catch {
 							// if parsing file text as JSON or Section is invalid, continue
 						}
 					})
