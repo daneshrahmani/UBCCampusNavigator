@@ -1,4 +1,3 @@
-import { relative } from "path";
 import Section from "../utils/Section";
 import { IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, InsightResult } from "./IInsightFacade";
 import JSZip from "jszip";
