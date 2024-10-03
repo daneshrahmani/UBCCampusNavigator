@@ -1,3 +1,4 @@
+import { relative } from "path";
 import Section from "../utils/Section";
 import { IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, InsightResult } from "./IInsightFacade";
 import JSZip from "jszip";
@@ -25,35 +26,38 @@ export default class InsightFacade implements IInsightFacade {
 
 		let data: JSZip;
 
-		const sections: Section[] = [];
-
 		try {
 			data = await JSZip.loadAsync(content, { base64: true });
-			for (const file of Object.values(data.files)) {
-				if (!file.dir) {
-					const courseData = await file.async("text");
-					for (const sectionData of JSON.parse(courseData).result) {
-						const section = new Section(sectionData);
-						sections.push(section);
-					}
-				}
-			}
-			//console.log(sections);
-			if (sections.length === 0) {
-				throw new InsightError("something");
-			}
 		} catch (err) {
-			//console.log(err)
 			throw new InsightError("Invalid base64 string");
 		}
 
-		//console.log(sections);
+		const sections: Section[] = [];
+		const sectionAdds: Promise<void>[] = [];
 
-		// if (sections.length === 0) {
-		// 	throw new InsightError("Dataset contains no valid sections");
-		// }
+		data.forEach((relativePath, file) => {
+			if (/courses\/.*/.test(relativePath)) {
+				sectionAdds.push(
+					file.async("text").then((value) => {
+						try {
+							for (const sectionData of JSON.parse(value).result) {
+								sections.push(new Section(sectionData));
+							}
+						} catch (e) {
+							// if parsing file text as JSON or Section is invalid, continue
+						}
+					})
+				);
+			}
+		});
 
-		console.log(sections);
+		// Wait for all sections to be added to sections array
+		await Promise.all(sectionAdds);
+
+		// Throw error is dataset contains no valid sections
+		if (sections.length === 0) {
+			throw new InsightError("No valid sections");
+		}
 
 		return new Promise((resolve, reject) => {
 			resolve(["nice"]);

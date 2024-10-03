@@ -39,7 +39,7 @@ export default class Section {
 		this.audit = data.Audit;
 
 		Object.values(this).forEach((val) => {
-			if (val === undefined) {
+			if (val === undefined || Number.isNaN(val)) {
 				throw new InsightError("Invalid Section");
 			}
 		});
