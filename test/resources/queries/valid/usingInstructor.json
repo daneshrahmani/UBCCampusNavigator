@@ -1,0 +1,37 @@
+{
+	"title": "Querying on instructor",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_instructor": "ellis, simon"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_id",
+				"sections_instructor",
+				"sections_avg"
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{"sections_dept":"wood","sections_id":"120","sections_instructor":"ellis, simon","sections_avg":70.83},
+		{"sections_dept":"wood","sections_id":"280","sections_instructor":"ellis, simon","sections_avg":70.87},
+		{"sections_dept":"wood","sections_id":"280","sections_instructor":"ellis, simon","sections_avg":69.85},
+		{"sections_dept":"wood","sections_id":"280","sections_instructor":"ellis, simon","sections_avg":67.37},
+		{"sections_dept":"wood","sections_id":"280","sections_instructor":"ellis, simon","sections_avg":67.23},
+		{"sections_dept":"wood","sections_id":"280","sections_instructor":"ellis, simon","sections_avg":68.92},
+		{"sections_dept":"wood","sections_id":"280","sections_instructor":"ellis, simon","sections_avg":68.25},
+		{"sections_dept":"wood","sections_id":"280","sections_instructor":"ellis, simon","sections_avg":70.55},
+		{"sections_dept":"wood","sections_id":"475","sections_instructor":"ellis, simon","sections_avg":71.25},
+		{"sections_dept":"wood","sections_id":"487","sections_instructor":"ellis, simon","sections_avg":67.56},
+		{"sections_dept":"wood","sections_id":"493","sections_instructor":"ellis, simon","sections_avg":75.33},
+		{"sections_dept":"wood","sections_id":"493","sections_instructor":"ellis, simon","sections_avg":79.55},
+		{"sections_dept":"wood","sections_id":"493","sections_instructor":"ellis, simon","sections_avg":74.83},
+		{"sections_dept":"wood","sections_id":"493","sections_instructor":"ellis, simon","sections_avg":73.75},
+		{"sections_dept":"wood","sections_id":"493","sections_instructor":"ellis, simon","sections_avg":76.54},
+		{"sections_dept":"wood","sections_id":"493","sections_instructor":"ellis, simon","sections_avg":75.58}
+	]
+}

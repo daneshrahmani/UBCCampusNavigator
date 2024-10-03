@@ -1,0 +1,16 @@
+{
+	"title": "Incorrect filter type",
+	"input": {
+		"WHERE": {
+			"sections_avg": 100
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_avg",
+				"sections_id"
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

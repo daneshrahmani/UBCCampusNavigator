@@ -1,0 +1,19 @@
+{
+	"title": "Referencing no datasets",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"avg": 0
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"dept",
+				"avg"
+			],
+			"ORDER": "avg"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

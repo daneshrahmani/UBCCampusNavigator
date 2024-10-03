@@ -1,0 +1,30 @@
+{
+	"title": "Wildcard on right success case",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"IS": {
+						"sections_dept": "d*"
+					}
+				},
+				{
+					"LT": {
+						"sections_avg": 60
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_id",
+				"sections_avg"
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected":[
+		{"sections_dept":"dhyg","sections_id":"405","sections_avg":58.4}
+	]
+}

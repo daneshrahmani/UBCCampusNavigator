@@ -1,0 +1,19 @@
+{
+	"title": "EmptyArray OR",
+	"input": {
+		"WHERE": {
+			"OR": [
+
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_avg"
+			],
+			"ORDER": "sections_dept"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
