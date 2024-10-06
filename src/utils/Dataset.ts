@@ -1,8 +1,8 @@
 import Section from "./Section";
 
 export default class Dataset {
-	private readonly id: string;
-	private readonly sections: Section[];
+	public readonly id: string;
+	public readonly sections: Section[];
 
 	constructor(id: string, sections: Section[]) {
 		this.id = id;
