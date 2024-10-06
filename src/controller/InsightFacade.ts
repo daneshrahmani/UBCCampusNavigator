@@ -1,5 +1,6 @@
 import Section from "../utils/Section";
-import { addDatasetParameterValidity } from "../utils/addDatasetHelpers";
+import Dataset from "../utils/Dataset";
+import { addToDisk, addDatasetParameterValidity } from "../utils/addDatasetHelpers";
 import { IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, InsightResult } from "./IInsightFacade";
 import JSZip from "jszip";
 
@@ -47,6 +48,9 @@ export default class InsightFacade implements IInsightFacade {
 		if (sections.length === 0) {
 			throw new InsightError("No valid sections");
 		}
+
+		const dataset = new Dataset(id, sections);
+		await addToDisk(id, dataset);
 
 		return new Promise((resolve, reject) => {
 			resolve(["nice"]);
