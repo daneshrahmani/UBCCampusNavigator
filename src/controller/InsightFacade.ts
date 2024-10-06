@@ -1,6 +1,6 @@
 import Section from "../utils/Section";
 import Dataset from "../utils/Dataset";
-import { addToDisk, addDatasetParameterValidity } from "../utils/addDatasetHelpers";
+import { addDatasetParameterValidity, addToDisk, getAddedDatasetIDs } from "../utils/addDatasetHelpers";
 import { IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, InsightResult } from "./IInsightFacade";
 import JSZip from "jszip";
 import * as path from "path";
@@ -64,10 +64,7 @@ export default class InsightFacade implements IInsightFacade {
 
 		const dataset = new Dataset(id, sections);
 		await addToDisk(this.dataDirectory, dataset);
-
-		return new Promise((resolve, reject) => {
-			resolve(["nice"]);
-		});
+		return await getAddedDatasetIDs(this.dataDirectory);
 	}
 
 	public async removeDataset(id: string): Promise<string> {
