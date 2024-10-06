@@ -1,5 +1,7 @@
 import { InsightError, InsightDatasetKind } from "../controller/IInsightFacade";
 import Dataset from "./Dataset";
+import * as fs from 'fs-extra';
+import * as path from 'path';
 
 export function addDatasetParameterValidity(id: string, kind: InsightDatasetKind): void {
 	// RegExp from ChatGPT
@@ -17,5 +19,8 @@ export function addDatasetParameterValidity(id: string, kind: InsightDatasetKind
 
 export async function addToDisk(dataDirectory: string, dataset: Dataset): Promise<void> {
 	// TODO: Import fs library and implement adding to disk at PROJECT_DIR/data
-	return;
+	const datasetFilePath = path.join(dataDirectory, `${dataset.id}.json`)
+	await fs.writeJson(datasetFilePath, {
+		sections: dataset.sections,
+	})
 }
