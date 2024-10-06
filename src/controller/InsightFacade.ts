@@ -3,6 +3,8 @@ import Dataset from "../utils/Dataset";
 import { addToDisk, addDatasetParameterValidity } from "../utils/addDatasetHelpers";
 import { IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, InsightResult } from "./IInsightFacade";
 import JSZip from "jszip";
+import * as path from "path";
+import * as fs from "fs-extra";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -10,8 +12,19 @@ import JSZip from "jszip";
  *
  */
 export default class InsightFacade implements IInsightFacade {
+	private readonly dataDirectory: string;
+
+	constructor() {
+		this.dataDirectory = path.join(__dirname, "..", "..", "data");
+	}
+
+	public async initialize(): Promise<void> {
+		await fs.ensureDir(this.dataDirectory);
+	}
+
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		// TODO: Remove this once you implement the methods!
+		await this.initialize();
 		addDatasetParameterValidity(id, kind);
 
 		let data: JSZip;
