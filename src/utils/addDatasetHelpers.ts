@@ -15,7 +15,7 @@ export function addDatasetParameterValidity(id: string, kind: InsightDatasetKind
 	}
 }
 
-export async function addToDisk(id: string, dataset: Dataset): Promise<void> {
+export async function addToDisk(dataDirectory: string, dataset: Dataset): Promise<void> {
 	// TODO: Import fs library and implement adding to disk at PROJECT_DIR/data
 	return;
 }

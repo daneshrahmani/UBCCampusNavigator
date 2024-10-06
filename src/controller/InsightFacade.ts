@@ -63,7 +63,7 @@ export default class InsightFacade implements IInsightFacade {
 		}
 
 		const dataset = new Dataset(id, sections);
-		await addToDisk(id, dataset);
+		await addToDisk(this.dataDirectory, dataset);
 
 		return new Promise((resolve, reject) => {
 			resolve(["nice"]);
