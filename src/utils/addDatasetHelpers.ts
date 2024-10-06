@@ -18,9 +18,17 @@ export function addDatasetParameterValidity(id: string, kind: InsightDatasetKind
 }
 
 export async function addToDisk(dataDirectory: string, dataset: Dataset): Promise<void> {
-	// TODO: Import fs library and implement adding to disk at PROJECT_DIR/data
 	const datasetFilePath = path.join(dataDirectory, `${dataset.id}.json`)
-	await fs.writeJson(datasetFilePath, {
-		sections: dataset.sections,
-	})
+		if (await fs.pathExists(datasetFilePath)) {
+			throw new InsightError(`Dataset ${dataset.id} already exists in disk memory`);
+		}
+
+		await fs.writeJson(datasetFilePath, {
+			sections: dataset.sections,
+		})
+}
+
+export async function getAddedDatasetIDs(dataDirectory: string): Promise<string[]> {
+	const datasetFiles = await fs.readdir(dataDirectory);
+	return datasetFiles.map(file => path.basename(file, '.json'));
 }
