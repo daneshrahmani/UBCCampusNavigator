@@ -1,0 +1,31 @@
+{
+	"title": "Querying on OR",
+	"input": {
+		"WHERE": {
+			"OR": [
+				{
+					"IS": {
+						"sections_dept": "ZOOL"
+					}
+				},
+				{
+					"IS": {
+						"sections_uuid": "4292"
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_dept",
+				"sections_id",
+				"sections_instructor",
+				"sections_avg"
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{"sections_dept":"wood","sections_id":"280","sections_instructor":"ellis, simon","sections_avg":70.87}
+	]
+}

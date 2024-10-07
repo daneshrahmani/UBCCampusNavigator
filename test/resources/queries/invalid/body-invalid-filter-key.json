@@ -1,0 +1,15 @@
+{
+	"title": "Body has invalid filter key",
+	"input": {
+		"WHERE": {
+			"BAD": {}
+		},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_avg"
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
