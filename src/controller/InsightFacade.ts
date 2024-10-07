@@ -1,10 +1,12 @@
 import Section from "../utils/Section";
-import Dataset from "../utils/Dataset";
 import { addDatasetParameterValidity, addToDisk, getAddedDatasetIDs } from "../utils/addDatasetHelpers";
 import { IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, InsightResult } from "./IInsightFacade";
 import JSZip from "jszip";
 import * as path from "path";
 import * as fs from "fs-extra";
+import { Dataset } from "../utils/Dataset";
+
+export const DATA_DIR = path.join(__dirname, "..", "..", "data");
 
 /**
  * This is the main programmatic entry point for the project.
@@ -12,14 +14,8 @@ import * as fs from "fs-extra";
  *
  */
 export default class InsightFacade implements IInsightFacade {
-	private readonly dataDirectory: string;
-
-	constructor() {
-		this.dataDirectory = path.join(__dirname, "..", "..", "data");
-	}
-
 	public async initialize(): Promise<void> {
-		await fs.ensureDir(this.dataDirectory);
+		await fs.ensureDir(DATA_DIR);
 	}
 
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
@@ -62,9 +58,8 @@ export default class InsightFacade implements IInsightFacade {
 			throw new InsightError("No valid sections");
 		}
 
-		const dataset = new Dataset(id, sections);
-		await addToDisk(this.dataDirectory, dataset);
-		return await getAddedDatasetIDs(this.dataDirectory);
+		await addToDisk(id, sections);
+		return await getAddedDatasetIDs();
 	}
 
 	public async removeDataset(id: string): Promise<string> {
@@ -79,6 +74,17 @@ export default class InsightFacade implements IInsightFacade {
 
 	public async listDatasets(): Promise<InsightDataset[]> {
 		// TODO: Remove this once you implement the methods!
-		throw new Error(`InsightFacadeImpl::listDatasets is unimplemented!`);
+		await this.initialize();
+		const datasetFiles = await fs.readdir(DATA_DIR);
+
+		const datasetPromises = [];
+		for (const fileName of datasetFiles) {
+			datasetPromises.push(
+				fs.readJSON(path.join(DATA_DIR, fileName)).then((content) => {
+					return new Dataset(fileName, InsightDatasetKind.Sections, content.sections.length);
+				})
+			);
+		}
+		return Promise.all(datasetPromises);
 	}
 }

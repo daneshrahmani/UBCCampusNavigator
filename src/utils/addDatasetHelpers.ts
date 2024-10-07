@@ -1,7 +1,9 @@
 import { InsightError, InsightDatasetKind } from "../controller/IInsightFacade";
-import Dataset from "./Dataset";
+import { Dataset } from "./Dataset";
 import * as fs from "fs-extra";
 import * as path from "path";
+import Section from "./Section";
+import { DATA_DIR } from "../controller/InsightFacade";
 
 export function addDatasetParameterValidity(id: string, kind: InsightDatasetKind): void {
 	// RegExp from ChatGPT
@@ -17,18 +19,17 @@ export function addDatasetParameterValidity(id: string, kind: InsightDatasetKind
 	}
 }
 
-export async function addToDisk(dataDirectory: string, dataset: Dataset): Promise<void> {
-	const datasetFilePath = path.join(dataDirectory, `${dataset.id}.json`);
+export async function addToDisk(id: string, sections: Section[]): Promise<void> {
+	const datasetFilePath = path.join(DATA_DIR, id);
 	if (await fs.pathExists(datasetFilePath)) {
-		throw new InsightError(`Dataset ${dataset.id} already exists in disk memory`);
+		throw new InsightError(`Dataset ${id} already exists in disk memory`);
 	}
 
 	await fs.writeJson(datasetFilePath, {
-		sections: dataset.sections,
+		sections: sections,
 	});
 }
 
-export async function getAddedDatasetIDs(dataDirectory: string): Promise<string[]> {
-	const datasetFiles = await fs.readdir(dataDirectory);
-	return datasetFiles.map((file) => path.basename(file, ".json"));
+export async function getAddedDatasetIDs(): Promise<string[]> {
+	return await fs.readdir(DATA_DIR);
 }

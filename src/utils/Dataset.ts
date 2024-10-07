@@ -1,15 +1,14 @@
-import Section from "./Section";
+import { InsightDataset, InsightDatasetKind } from "../controller/IInsightFacade";
 
-export default class Dataset {
+export class Dataset implements InsightDataset {
 	public readonly id: string;
-	public readonly sections: Section[];
+	// public readonly sections: Section[];
+	public readonly kind: InsightDatasetKind;
+	public readonly numRows: number;
 
-	constructor(id: string, sections: Section[]) {
+	constructor(id: string, kind: InsightDatasetKind, numRows: number) {
 		this.id = id;
-		this.sections = sections;
-	}
-
-	public getNumRows(): number {
-		return this.sections.length;
+		this.kind = kind;
+		this.numRows = numRows;
 	}
 }
