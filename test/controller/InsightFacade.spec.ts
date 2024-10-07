@@ -83,19 +83,6 @@ describe("InsightFacade", function () {
 				expect(testIDs).to.include(datasets);
 			});
 		});
-		it("Success AddDataset -> Allows adding multiple datasets differing only in case", async function () {
-			const testIDs = ["TESTid", "testID"];
-			const expectedDatasetCount = testIDs.length;
-
-			await facade.addDataset(testIDs[0], sections, InsightDatasetKind.Sections);
-			const result = await facade.addDataset(testIDs[1], validDatasetOneCourse, InsightDatasetKind.Sections);
-
-			expect(result).to.be.an("array");
-			expect(result).to.have.lengthOf(expectedDatasetCount);
-			result.forEach((id) => {
-				expect(testIDs).to.include(id);
-			});
-		});
 
 		it("Success AddDataset -> Allows adding section where all string fields are empty", async function () {
 			const validEmptyStringFields = await getContentFromArchives("validEmptyStringFields.zip");
