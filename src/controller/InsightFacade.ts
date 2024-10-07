@@ -1,6 +1,13 @@
 import Section from "../utils/Section";
 import { addDatasetParameterValidity, addToDisk, getAddedDatasetIDs, validateId } from "../utils/helpers";
-import { IInsightFacade, InsightDataset, InsightDatasetKind, InsightError, InsightResult, NotFoundError } from "./IInsightFacade";
+import {
+	IInsightFacade,
+	InsightDataset,
+	InsightDatasetKind,
+	InsightError,
+	InsightResult,
+	NotFoundError,
+} from "./IInsightFacade";
 import JSZip from "jszip";
 import * as path from "path";
 import * as fs from "fs-extra";
@@ -64,9 +71,9 @@ export default class InsightFacade implements IInsightFacade {
 
 	public async removeDataset(id: string): Promise<string> {
 		// TODO: Remove this once you implement the methods!
-		
+
 		validateId(id);
-		
+
 		const addedIds = await getAddedDatasetIDs();
 		if (!addedIds.includes(id)) {
 			throw new NotFoundError(`Dataset ${id} not found`);

@@ -1,5 +1,4 @@
 import { InsightError, InsightDatasetKind } from "../controller/IInsightFacade";
-import { Dataset } from "./Dataset";
 import * as fs from "fs-extra";
 import * as path from "path";
 import Section from "./Section";
@@ -15,7 +14,6 @@ export function validateId(id: string): void {
 }
 
 export function addDatasetParameterValidity(id: string, kind: InsightDatasetKind): void {
-
 	validateId(id);
 
 	// To be removed in a later checkpoint
