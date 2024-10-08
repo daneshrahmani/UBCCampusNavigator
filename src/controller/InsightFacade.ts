@@ -97,7 +97,6 @@ export default class InsightFacade implements IInsightFacade {
 		if (typeof query === "object" && query !== null && "WHERE" in query) {
 			fs.readJSON(path.join(DATA_DIR, datasetId)).then((content) => {
 				const filteredSections = content.sections.filter((section: any) => sectionSatisfies(query.WHERE, section))
-				console.log(filteredSections)
 				// TODO turn filtered sections into InsightResults
 			})
 		}

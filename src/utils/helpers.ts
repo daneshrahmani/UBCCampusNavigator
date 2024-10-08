@@ -82,7 +82,6 @@ export function sectionSatisfies(whereClause: any, section: any): boolean {
 			return section[mfield] < number;
 		} else if (key === "GT") {
 			const [mfield, number] = parseMComparison(val);
-			console.log(section[mfield], number, section[mfield] > number)
 			return section[mfield] > number;
 		} else if (key === "EQ") {
 			const [mfield, number] = parseMComparison(val);
