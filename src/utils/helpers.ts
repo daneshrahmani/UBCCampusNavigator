@@ -1,4 +1,4 @@
-import { InsightError, InsightDatasetKind } from "../controller/IInsightFacade";
+import { InsightError, InsightDatasetKind, InsightResult } from "../controller/IInsightFacade";
 import * as fs from "fs-extra";
 import * as path from "path";
 import Section from "./Section";
@@ -94,6 +94,19 @@ export function sectionSatisfies(whereClause: any, section: any): boolean {
 			throw new InsightError("Invalid key");
 		}
 	}
+}
+
+export function sortedResults(results: InsightResult[], query: any): InsightResult[] {
+	const orderingKey = query.OPTIONS.ORDER;
+	return results.sort((a: any, b: any) => {
+		if (a[orderingKey] < b[orderingKey]) {
+			return -1;
+		}
+		if (a[orderingKey] > b[orderingKey]) {
+			return 1;
+		}
+		return 0;
+	});
 }
 
 function parseMComparison(mComparison: object): [string, number] {

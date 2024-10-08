@@ -4,6 +4,7 @@ import {
 	addToDisk,
 	getAddedDatasetIDs,
 	sectionSatisfies,
+	sortedResults,
 	validateId,
 	validateQueryStructure,
 } from "../utils/helpers";
@@ -114,6 +115,11 @@ export default class InsightFacade implements IInsightFacade {
 				throw new ResultTooLargeError("Query is returning more than 5000 items");
 			}
 
+			// Sort results if needed
+			if (queryObj.OPTIONS.ORDER) {
+				return sortedResults(results, queryObj);
+			}
+
 			return results;
 		} catch (err) {
 			if (err instanceof ResultTooLargeError) {
@@ -121,8 +127,6 @@ export default class InsightFacade implements IInsightFacade {
 			}
 			throw new InsightError(`Error: ${err}`);
 		}
-
-		throw new Error(`InsightFacadeImpl::performQuery() is unimplemented! - query=${query};`);
 	}
 
 	public async listDatasets(): Promise<InsightDataset[]> {
