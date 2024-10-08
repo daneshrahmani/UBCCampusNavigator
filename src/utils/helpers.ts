@@ -72,9 +72,10 @@ export function sectionSatisfies(whereClause: any, section: any): boolean {
 	} else {
 		const key = whereClauseEntries[0][0];
 		const val: any = whereClauseEntries[0][1];
-		if (key === "AND" || key === "OR") {
-			validateLogicFilters(val);
+		if (key === "AND") {
 			return val.every((subClause: any) => sectionSatisfies(subClause, section));
+		} else if (key === "OR") {
+			return val.some((subClause: any) => sectionSatisfies(subClause, section));
 		} else if (key === "LT") {
 			const [mfield, number] = parseMComparison(val);
 			return section[mfield] < number;
@@ -86,9 +87,8 @@ export function sectionSatisfies(whereClause: any, section: any): boolean {
 			return section[mfield] === number;
 		} else if (key === "IS") {
 			const [sfield, pattern] = parseSComparison(val);
-			return pattern.test(sfield);
+			return pattern.test(section[sfield]);
 		} else if (key === "NOT") {
-			validateLogicFilters(val);
 			return !sectionSatisfies(val, section);
 		} else {
 			throw new InsightError("Invalid key");
