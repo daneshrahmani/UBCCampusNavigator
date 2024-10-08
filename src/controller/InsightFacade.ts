@@ -14,6 +14,7 @@ import {
 	InsightError,
 	InsightResult,
 	NotFoundError,
+	ResultTooLargeError,
 } from "./IInsightFacade";
 import JSZip from "jszip";
 import * as path from "path";
@@ -91,14 +92,34 @@ export default class InsightFacade implements IInsightFacade {
 
 	public async performQuery(query: unknown): Promise<InsightResult[]> {
 		// TODO: Remove this once you implement the methods!
-
 		const datasetId = validateQueryStructure(query);
+		const maximumResultLength = 5000;
+		const queryObj = query as { WHERE: any; OPTIONS: { COLUMNS: string[]; ORDER?: string } };
+		try {
+			const content = await fs.readJSON(path.join(DATA_DIR, datasetId));
+			const filteredSects = content.sections.filter((section: any) => sectionSatisfies(queryObj.WHERE, section));
 
-		if (typeof query === "object" && query !== null && "WHERE" in query) {
-			fs.readJSON(path.join(DATA_DIR, datasetId)).then((content) => {
-				const filteredSections = content.sections.filter((section: any) => sectionSatisfies(query.WHERE, section))
-				// TODO turn filtered sections into InsightResults
-			})
+			const columns = queryObj.OPTIONS.COLUMNS;
+			const results = filteredSects.map((section: any) => {
+				const result: InsightResult = {};
+				for (const column of columns) {
+					// Array destructuring from ChatGPT
+					const [, field] = column.split("_");
+					result[column] = section[field];
+				}
+				return result;
+			});
+
+			if (results.length > maximumResultLength) {
+				throw new ResultTooLargeError("Query is returning more than 5000 items");
+			}
+
+			return results;
+		} catch (err) {
+			if (err instanceof ResultTooLargeError) {
+				throw err;
+			}
+			throw new InsightError(`Error: ${err}`);
 		}
 
 		throw new Error(`InsightFacadeImpl::performQuery() is unimplemented! - query=${query};`);
