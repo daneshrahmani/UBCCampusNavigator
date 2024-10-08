@@ -1,5 +1,11 @@
 import Section from "../utils/Section";
-import { addDatasetParameterValidity, addToDisk, getAddedDatasetIDs, validateId } from "../utils/helpers";
+import {
+	addDatasetParameterValidity,
+	addToDisk,
+	getAddedDatasetIDs,
+	validateId,
+	validateQueryStructure,
+} from "../utils/helpers";
 import {
 	IInsightFacade,
 	InsightDataset,
@@ -84,6 +90,9 @@ export default class InsightFacade implements IInsightFacade {
 
 	public async performQuery(query: unknown): Promise<InsightResult[]> {
 		// TODO: Remove this once you implement the methods!
+
+		validateQueryStructure(query);
+
 		throw new Error(`InsightFacadeImpl::performQuery() is unimplemented! - query=${query};`);
 	}
 

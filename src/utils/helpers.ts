@@ -36,3 +36,25 @@ export async function addToDisk(id: string, sections: Section[]): Promise<void> 
 export async function getAddedDatasetIDs(): Promise<string[]> {
 	return await fs.readdir(DATA_DIR);
 }
+
+export function validateQueryStructure(query: unknown): void {
+	if (
+		!(
+			typeof query === "object" &&
+			!Array.isArray(query) &&
+			query !== null &&
+			"WHERE" in query &&
+			!Array.isArray(query.WHERE) &&
+			"OPTIONS" in query &&
+			typeof query.OPTIONS === "object" &&
+			!Array.isArray(query.OPTIONS) &&
+			query.OPTIONS !== null &&
+			"COLUMNS" in query.OPTIONS &&
+			query.OPTIONS.COLUMNS !== null &&
+			Array.isArray(query.OPTIONS.COLUMNS) &&
+			query.OPTIONS.COLUMNS.length >= 1
+		)
+	) {
+		throw new InsightError("Invalid Query Structure");
+	}
+}

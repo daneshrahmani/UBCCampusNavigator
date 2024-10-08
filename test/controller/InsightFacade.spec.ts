@@ -447,7 +447,6 @@ describe("InsightFacade", function () {
 			const { input, expected, errorExpected } = await loadTestQuery(this.test.title);
 			let result: InsightResult[];
 			try {
-				expect(input).to.be.an("object");
 				result = await facade.performQuery(input);
 
 				// If we get here, then performQuery did not throw error
