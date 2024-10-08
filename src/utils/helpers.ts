@@ -128,7 +128,7 @@ function parseSComparison(sComparison: object): [string, RegExp] {
 	} else {
 		const skey = sComparisonEntries[0][0];
 		const sfield = skey.split("_")[1];
-		const pattern = RegExp(sComparisonEntries[0][1].replace(/\*/g, ".*"));
+		const pattern = RegExp("^" + sComparisonEntries[0][1].replace(/\*/g, ".*") + "$");
 		return [sfield, pattern];
 	}
 }
