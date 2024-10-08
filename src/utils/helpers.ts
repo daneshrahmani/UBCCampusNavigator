@@ -171,6 +171,7 @@ function validateWhereClause(whereClause: any, datasetId: string): void {
 		const val: any = whereClauseEntries[0][1];
 		if (validFilters.includes(key)) {
 			if (key === "AND" || key === "OR") {
+				validateLogicFilters(val);
 				for (const subclause of val) {
 					validateWhereClause(subclause, datasetId);
 				}

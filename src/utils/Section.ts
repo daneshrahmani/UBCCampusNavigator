@@ -32,7 +32,7 @@ export default class Section {
 		this.title = data.Title;
 		this.instructor = data.Professor;
 		this.dept = data.Subject;
-		if (data["Section"] === "overall") {
+		if (data.Section === "overall") {
 			this.year = 1900;
 		} else {
 			this.year = Number(data.Year);
