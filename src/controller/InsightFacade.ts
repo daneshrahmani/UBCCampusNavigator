@@ -3,6 +3,7 @@ import {
 	addDatasetParameterValidity,
 	addToDisk,
 	getAddedDatasetIDs,
+	sectionSatisfies,
 	validateId,
 	validateQueryStructure,
 } from "../utils/helpers";
@@ -91,7 +92,15 @@ export default class InsightFacade implements IInsightFacade {
 	public async performQuery(query: unknown): Promise<InsightResult[]> {
 		// TODO: Remove this once you implement the methods!
 
-		validateQueryStructure(query);
+		const datasetId = validateQueryStructure(query);
+
+		if (typeof query === "object" && query !== null && "WHERE" in query) {
+			fs.readJSON(path.join(DATA_DIR, datasetId)).then((content) => {
+				const filteredSections = content.sections.filter((section: any) => sectionSatisfies(query.WHERE, section))
+				console.log(filteredSections)
+				// TODO turn filtered sections into InsightResults
+			})
+		}
 
 		throw new Error(`InsightFacadeImpl::performQuery() is unimplemented! - query=${query};`);
 	}

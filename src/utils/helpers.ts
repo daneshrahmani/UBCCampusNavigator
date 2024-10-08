@@ -37,7 +37,7 @@ export async function getAddedDatasetIDs(): Promise<string[]> {
 	return await fs.readdir(DATA_DIR);
 }
 
-export function validateQueryStructure(query: unknown): void {
+export function validateQueryStructure(query: unknown): string {
 	if (
 		!(
 			typeof query === "object" &&
@@ -56,46 +56,44 @@ export function validateQueryStructure(query: unknown): void {
 		)
 	) {
 		throw new InsightError("Invalid Query Structure");
+	} else {
+		const datasetId = validateOptions(query);
+		validateWhereClause(query.WHERE, datasetId);
+		return datasetId
 	}
 }
 
-export function sectionSatisfies(whereClause: object, section: any): boolean {
+export function sectionSatisfies(whereClause: any, section: any): boolean {
 	const whereClauseEntries = Object.entries(whereClause);
 	if (whereClauseEntries.length === 0) {
-		return true
+		return true;
 	} else if (whereClauseEntries.length > 1) {
-		throw new InsightError("Inivalid Query")
+		throw new InsightError("Invalid Query");
 	} else {
 		const key = whereClauseEntries[0][0];
-		const val = whereClauseEntries[0][1];
-		
+		const val: any = whereClauseEntries[0][1];
+
 		if (key === "AND") {
-			return val.every((subClause: any) => sectionSatisfies(subClause, section))
-		}
-		else if (key === "OR"){
-			return val.some((subClause: any) => sectionSatisfies(subClause, section))
-		}
-		else if (key === "LT") {
+			return val.every((subClause: any) => sectionSatisfies(subClause, section));
+		} else if (key === "OR") {
+			return val.some((subClause: any) => sectionSatisfies(subClause, section));
+		} else if (key === "LT") {
 			const [mfield, number] = parseMComparison(val);
 			return section[mfield] < number;
-		}
-		else if (key === "GT") {
+		} else if (key === "GT") {
 			const [mfield, number] = parseMComparison(val);
+			console.log(section[mfield], number, section[mfield] > number)
 			return section[mfield] > number;
-		}
-		else if (key === "EQ") {
+		} else if (key === "EQ") {
 			const [mfield, number] = parseMComparison(val);
-			return section[mfield] === number; 
-		}
-		else if (key === "IS") {
+			return section[mfield] === number;
+		} else if (key === "IS") {
 			const [sfield, pattern] = parseSComparison(val);
 			return pattern.test(sfield);
-		}
-		else if (key === "NOT") {
+		} else if (key === "NOT") {
 			return !sectionSatisfies(val, section);
-		}
-		else {
-			throw new InsightError("Invalid key")
+		} else {
+			throw new InsightError("Invalid key");
 		}
 	}
 }
@@ -108,7 +106,7 @@ function parseMComparison(mComparison: object) {
 		const mkey = mComparisonEntries[0][0];
 		const mfield = mkey.split("_")[1];
 		const number = Number(mComparisonEntries[0][1]);
-		return [mfield, number]
+		return [mfield, number];
 	}
 }
 
@@ -121,5 +119,58 @@ function parseSComparison(sComparison: object): [string, RegExp] {
 		const sfield = skey.split("_")[1];
 		const pattern = RegExp(sComparisonEntries[0][1]);
 		return [sfield, pattern];
+	}
+}
+
+const validFilters = ["NOT", "AND", "OR", "LT", "GT", "EQ", "IS"];
+const validFields = ["avg", "pass", "fail", "audit", "year", "dept", "id", "instructor", "title", "uuid"];
+
+// Validate the options field of the query and return the dataset id
+function validateOptions(query: any) {
+	let datasetId = null;
+	const queryColumns = query.OPTIONS.COLUMNS;
+	for (const column of queryColumns) {
+		const parsedColumn = column.split("_");
+		if (parsedColumn.length !== 2) {
+			throw new InsightError("Invalid column selection");
+		}
+
+		if (datasetId === null) {
+			datasetId = parsedColumn[0];
+		} else if (datasetId !== parsedColumn[0]) {
+			throw new InsightError("Query references multiple datasets");
+		}
+
+		if (!validFields.includes(parsedColumn[1])) {
+			throw new InsightError("Invalid column selection");
+		}
+	}
+	return datasetId;
+}
+
+function validateWhereClause(whereClause: any, datasetId: string) {
+	const whereClauseEntries = Object.entries(whereClause);
+	if (whereClauseEntries.length === 0) {
+		return;
+	} else if (whereClauseEntries.length > 1) {
+		throw new InsightError("Invalid Query");
+	} else {
+		const key = whereClauseEntries[0][0];
+		const val = whereClauseEntries[0][1];
+		if (validFilters.includes(key)) {
+			validateWhereClause(val, datasetId);
+		} else {
+			// Expect key to be of the form "sections_avg for example
+			const parsedKey = key.split("_");
+			if (parsedKey.length !== 2) {
+				throw new InsightError("Invalid query");
+			}
+			if (parsedKey[0] !== datasetId) {
+				throw new InsightError("Query references multiple datasets");
+			}
+			if (!(validFields.includes(parsedKey[1]))) {
+				throw new InsightError("Where clause contains invalid field");
+			}
+		}
 	}
 }
