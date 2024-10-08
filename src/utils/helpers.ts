@@ -127,9 +127,10 @@ const validFields = ["avg", "pass", "fail", "audit", "year", "dept", "id", "inst
 function validateOptions(query: any): string {
 	let datasetId = null;
 	const queryColumns = query.OPTIONS.COLUMNS;
+	const maxLength = 2;
 	for (const column of queryColumns) {
 		const parsedColumn = column.split("_");
-		if (parsedColumn.length !== 2) {
+		if (parsedColumn.length !== maxLength) {
 			throw new InsightError("Invalid column selection");
 		}
 
@@ -159,8 +160,9 @@ function validateWhereClause(whereClause: any, datasetId: string): void {
 			validateWhereClause(val, datasetId);
 		} else {
 			// Expect key to be of the form "sections_avg for example
+			const maxLength = 2;
 			const parsedKey = key.split("_");
-			if (parsedKey.length !== 2) {
+			if (parsedKey.length !== maxLength) {
 				throw new InsightError("Invalid query");
 			}
 			if (parsedKey[0] !== datasetId) {
