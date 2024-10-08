@@ -58,3 +58,68 @@ export function validateQueryStructure(query: unknown): void {
 		throw new InsightError("Invalid Query Structure");
 	}
 }
+
+export function sectionSatisfies(whereClause: object, section: any): boolean {
+	const whereClauseEntries = Object.entries(whereClause);
+	if (whereClauseEntries.length === 0) {
+		return true
+	} else if (whereClauseEntries.length > 1) {
+		throw new InsightError("Inivalid Query")
+	} else {
+		const key = whereClauseEntries[0][0];
+		const val = whereClauseEntries[0][1];
+		
+		if (key === "AND") {
+			return val.every((subClause: any) => sectionSatisfies(subClause, section))
+		}
+		else if (key === "OR"){
+			return val.some((subClause: any) => sectionSatisfies(subClause, section))
+		}
+		else if (key === "LT") {
+			const [mfield, number] = parseMComparison(val);
+			return section[mfield] < number;
+		}
+		else if (key === "GT") {
+			const [mfield, number] = parseMComparison(val);
+			return section[mfield] > number;
+		}
+		else if (key === "EQ") {
+			const [mfield, number] = parseMComparison(val);
+			return section[mfield] === number; 
+		}
+		else if (key === "IS") {
+			const [sfield, pattern] = parseSComparison(val);
+			return pattern.test(sfield);
+		}
+		else if (key === "NOT") {
+			return !sectionSatisfies(val, section);
+		}
+		else {
+			throw new InsightError("Invalid key")
+		}
+	}
+}
+
+function parseMComparison(mComparison: object) {
+	const mComparisonEntries = Object.entries(mComparison);
+	if (mComparisonEntries.length !== 1) {
+		throw new InsightError("Invalid query");
+	} else {
+		const mkey = mComparisonEntries[0][0];
+		const mfield = mkey.split("_")[1];
+		const number = Number(mComparisonEntries[0][1]);
+		return [mfield, number]
+	}
+}
+
+function parseSComparison(sComparison: object): [string, RegExp] {
+	const sComparisonEntries = Object.entries(sComparison);
+	if (sComparisonEntries.length !== 1) {
+		throw new InsightError("Invalid query");
+	} else {
+		const skey = sComparisonEntries[0][0];
+		const sfield = skey.split("_")[1];
+		const pattern = RegExp(sComparisonEntries[0][1]);
+		return [sfield, pattern];
+	}
+}

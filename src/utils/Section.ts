@@ -15,16 +15,16 @@ interface SectionDataObject {
 }
 
 export default class Section {
-	private readonly uuid: string; // unique id of section
-	private readonly id: string; // course id
-	private readonly title: string; // name of course
-	private readonly instructor: string; // prof
-	private readonly dept: string; // dept
-	private readonly year: number;
-	private readonly average: number;
-	private readonly pass: number;
-	private readonly fail: number;
-	private readonly audit: number;
+	public readonly uuid: string; // unique id of section
+	public readonly id: string; // course id
+	public readonly title: string; // name of course
+	public readonly instructor: string; // prof
+	public readonly dept: string; // dept
+	public readonly year: number;
+	public readonly avg: number;
+	public readonly pass: number;
+	public readonly fail: number;
+	public readonly audit: number;
 
 	constructor(data: SectionDataObject) {
 		this.uuid = data.id.toString();
@@ -33,7 +33,7 @@ export default class Section {
 		this.instructor = data.Professor;
 		this.dept = data.Subject;
 		this.year = Number(data.Year);
-		this.average = data.Avg;
+		this.avg = data.Avg;
 		this.pass = data.Pass;
 		this.fail = data.Fail;
 		this.audit = data.Audit;
