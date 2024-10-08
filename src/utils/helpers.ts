@@ -1,4 +1,4 @@
-import { InsightError, InsightDatasetKind } from "../controller/IInsightFacade";
+import { InsightError, InsightDatasetKind, InsightResult } from "../controller/IInsightFacade";
 import * as fs from "fs-extra";
 import * as path from "path";
 import Section from "./Section";
@@ -72,9 +72,10 @@ export function sectionSatisfies(whereClause: any, section: any): boolean {
 	} else {
 		const key = whereClauseEntries[0][0];
 		const val: any = whereClauseEntries[0][1];
-		if (key === "AND" || key === "OR") {
-			validateLogicFilters(val);
+		if (key === "AND") {
 			return val.every((subClause: any) => sectionSatisfies(subClause, section));
+		} else if (key === "OR") {
+			return val.some((subClause: any) => sectionSatisfies(subClause, section));
 		} else if (key === "LT") {
 			const [mfield, number] = parseMComparison(val);
 			return section[mfield] < number;
@@ -86,14 +87,26 @@ export function sectionSatisfies(whereClause: any, section: any): boolean {
 			return section[mfield] === number;
 		} else if (key === "IS") {
 			const [sfield, pattern] = parseSComparison(val);
-			return pattern.test(sfield);
+			return pattern.test(section[sfield]);
 		} else if (key === "NOT") {
-			validateLogicFilters(val);
 			return !sectionSatisfies(val, section);
 		} else {
 			throw new InsightError("Invalid key");
 		}
 	}
+}
+
+export function sortedResults(results: InsightResult[], query: any): InsightResult[] {
+	const orderingKey = query.OPTIONS.ORDER;
+	return results.sort((a: any, b: any) => {
+		if (a[orderingKey] < b[orderingKey]) {
+			return -1;
+		}
+		if (a[orderingKey] > b[orderingKey]) {
+			return 1;
+		}
+		return 0;
+	});
 }
 
 function parseMComparison(mComparison: object): [string, number] {
@@ -115,7 +128,7 @@ function parseSComparison(sComparison: object): [string, RegExp] {
 	} else {
 		const skey = sComparisonEntries[0][0];
 		const sfield = skey.split("_")[1];
-		const pattern = RegExp(sComparisonEntries[0][1]);
+		const pattern = RegExp(sComparisonEntries[0][1].replace(/\*/g, ".*"));
 		return [sfield, pattern];
 	}
 }
@@ -155,9 +168,15 @@ function validateWhereClause(whereClause: any, datasetId: string): void {
 		throw new InsightError("Invalid Query");
 	} else {
 		const key = whereClauseEntries[0][0];
-		const val = whereClauseEntries[0][1];
+		const val: any = whereClauseEntries[0][1];
 		if (validFilters.includes(key)) {
-			validateWhereClause(val, datasetId);
+			if (key === "AND" || key === "OR") {
+				for (const subclause of val) {
+					validateWhereClause(subclause, datasetId);
+				}
+			} else {
+				validateWhereClause(val, datasetId);
+			}
 		} else {
 			// Expect key to be of the form "sections_avg for example
 			const maxLength = 2;
