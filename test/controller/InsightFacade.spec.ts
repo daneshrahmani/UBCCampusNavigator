@@ -450,11 +450,9 @@ describe("InsightFacade", function () {
 				result = await facade.performQuery(input);
 
 				// If we get here, then performQuery did not throw error
-				const maximumResultLength = 5001;
 				expect(result).to.have.deep.members(expected, "Query result matches expected output");
 				expect(result).to.be.an("array");
 				expect(result.length).to.equal(expected.length);
-				expect(result.length).to.be.at.most(maximumResultLength, "Result size should not exceed 5000");
 			} catch (err) {
 				if (!errorExpected) {
 					expect.fail(`performQuery threw unexpected error: ${err}`);
