@@ -168,9 +168,15 @@ function validateWhereClause(whereClause: any, datasetId: string): void {
 		throw new InsightError("Invalid Query");
 	} else {
 		const key = whereClauseEntries[0][0];
-		const val = whereClauseEntries[0][1];
+		const val: any = whereClauseEntries[0][1];
 		if (validFilters.includes(key)) {
-			validateWhereClause(val, datasetId);
+			if (key === "AND" || key === "OR") {
+				for (const subclause of val) {
+					validateWhereClause(subclause, datasetId);
+				}
+			} else {
+				validateWhereClause(val, datasetId);
+			}
 		} else {
 			// Expect key to be of the form "sections_avg for example
 			const maxLength = 2;
