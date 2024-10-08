@@ -59,7 +59,7 @@ export function validateQueryStructure(query: unknown): string {
 	} else {
 		const datasetId = validateOptions(query);
 		validateWhereClause(query.WHERE, datasetId);
-		return datasetId
+		return datasetId;
 	}
 }
 
@@ -72,11 +72,9 @@ export function sectionSatisfies(whereClause: any, section: any): boolean {
 	} else {
 		const key = whereClauseEntries[0][0];
 		const val: any = whereClauseEntries[0][1];
-
-		if (key === "AND") {
+		if (key === "AND" || key === "OR") {
+			validateLogicFilters(val);
 			return val.every((subClause: any) => sectionSatisfies(subClause, section));
-		} else if (key === "OR") {
-			return val.some((subClause: any) => sectionSatisfies(subClause, section));
 		} else if (key === "LT") {
 			const [mfield, number] = parseMComparison(val);
 			return section[mfield] < number;
@@ -90,6 +88,7 @@ export function sectionSatisfies(whereClause: any, section: any): boolean {
 			const [sfield, pattern] = parseSComparison(val);
 			return pattern.test(sfield);
 		} else if (key === "NOT") {
+			validateLogicFilters(val);
 			return !sectionSatisfies(val, section);
 		} else {
 			throw new InsightError("Invalid key");
@@ -97,7 +96,7 @@ export function sectionSatisfies(whereClause: any, section: any): boolean {
 	}
 }
 
-function parseMComparison(mComparison: object) {
+function parseMComparison(mComparison: object): [string, number] {
 	const mComparisonEntries = Object.entries(mComparison);
 	if (mComparisonEntries.length !== 1) {
 		throw new InsightError("Invalid query");
@@ -125,7 +124,7 @@ const validFilters = ["NOT", "AND", "OR", "LT", "GT", "EQ", "IS"];
 const validFields = ["avg", "pass", "fail", "audit", "year", "dept", "id", "instructor", "title", "uuid"];
 
 // Validate the options field of the query and return the dataset id
-function validateOptions(query: any) {
+function validateOptions(query: any): string {
 	let datasetId = null;
 	const queryColumns = query.OPTIONS.COLUMNS;
 	for (const column of queryColumns) {
@@ -147,7 +146,7 @@ function validateOptions(query: any) {
 	return datasetId;
 }
 
-function validateWhereClause(whereClause: any, datasetId: string) {
+function validateWhereClause(whereClause: any, datasetId: string): void {
 	const whereClauseEntries = Object.entries(whereClause);
 	if (whereClauseEntries.length === 0) {
 		return;
@@ -167,9 +166,19 @@ function validateWhereClause(whereClause: any, datasetId: string) {
 			if (parsedKey[0] !== datasetId) {
 				throw new InsightError("Query references multiple datasets");
 			}
-			if (!(validFields.includes(parsedKey[1]))) {
+			if (!validFields.includes(parsedKey[1])) {
 				throw new InsightError("Where clause contains invalid field");
 			}
 		}
 	}
+}
+
+// For validating that AND, OR & NOT are not empty
+function validateLogicFilters(logicFilter: any): void {
+	if (Array.isArray(logicFilter) && logicFilter.length > 0) {
+		return;
+	} else if (Object.keys(logicFilter).length > 0) {
+		return;
+	}
+	throw new InsightError("AND/OR/NOT cannot be empty");
 }
