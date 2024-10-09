@@ -157,6 +157,9 @@ function validateOptions(query: any): string {
 			throw new InsightError("Invalid column selection");
 		}
 	}
+	if (query.OPTIONS.ORDER && !queryColumns.includes(query.OPTIONS.ORDER)) {
+		throw new InsightError("Order key does not exist in the columns being queried");
+	}
 	return datasetId;
 }
 
@@ -176,10 +179,11 @@ function validateWhereClause(whereClause: any, datasetId: string): void {
 					validateWhereClause(subclause, datasetId);
 				}
 			} else {
+				validateNonLogicFilters(key, val);
 				validateWhereClause(val, datasetId);
 			}
 		} else {
-			// Expect key to be of the form "sections_avg for example
+			// Expect key to be of the form "sections_avg" for example
 			const maxLength = 2;
 			const parsedKey = key.split("_");
 			if (parsedKey.length !== maxLength) {
@@ -203,4 +207,49 @@ function validateLogicFilters(logicFilter: any): void {
 		return;
 	}
 	throw new InsightError("AND/OR/NOT cannot be empty");
+}
+
+function validateNonLogicFilters(key: any, val: any): void {
+	const stringFields = ["dept", "id", "instructor", "title", "uuid"];
+	const [[objectKey], [objectValue]] = [Object.keys(val), Object.values(val)];
+
+	switch (key) {
+		case "NOT":
+			validateLogicFilters(val);
+			break;
+		case "EQ":
+		case "GT":
+		case "LT": {
+			// Checking that Key exists and is not a string type
+			if (!objectKey) {
+				throw new InsightError("Missing key for EQ, GT, or LT");
+			}
+			const field = objectKey.split("_");
+			if (field.length > 1 && stringFields.includes(field[1])) {
+				throw new InsightError("Invalid Key type for EQ, GT, or LT");
+			}
+
+			// Checking that Value is of type Number
+			if (typeof objectValue !== "number") {
+				throw new InsightError("Invalid Value type for EQ, GT or LT. Value type must be a number");
+			}
+
+			break;
+		}
+		case "IS": {
+			// Check that IS value is a string type
+			if (typeof objectValue !== "string") {
+				throw new InsightError("Invalid Value type for IS. Value type must be a string");
+			}
+
+			// Check that if wildcards are used, they are not embedded
+			if (objectValue.includes("*")) {
+				if ((!objectValue.startsWith("*") && !objectValue.endsWith("*")) || objectValue === "***") {
+					throw new InsightError("Invalid use of Wildcard. Wildcard cannot be embedded in a word.");
+				}
+			}
+
+			break;
+		}
+	}
 }
