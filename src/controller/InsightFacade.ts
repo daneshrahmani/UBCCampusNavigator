@@ -1,6 +1,5 @@
-import Section from "../utils/Section";
+import Section, { parseSectionsData } from "../utils/Section";
 import {
-	addDatasetParameterValidity,
 	addToDisk,
 	getAddedDatasetIDs,
 	sectionSatisfies,
@@ -21,6 +20,7 @@ import JSZip from "jszip";
 import * as path from "path";
 import * as fs from "fs-extra";
 import { Dataset } from "../utils/Dataset";
+import Room, { parseRoomsData } from "../utils/Room";
 
 export const DATA_DIR = path.join(__dirname, "..", "..", "data");
 
@@ -35,9 +35,8 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-		// TODO: Remove this once you implement the methods!
 		await this.initialize();
-		addDatasetParameterValidity(id, kind);
+		validateId(id);
 
 		let data: JSZip;
 
@@ -47,34 +46,17 @@ export default class InsightFacade implements IInsightFacade {
 			throw new InsightError(`Invalid base64 string: ${err instanceof Error ? err.message : String(err)}`);
 		}
 
-		const sections: Section[] = [];
-		const sectionAdds: Promise<void>[] = [];
+		let entries: Section[] | Room[];
 
-		data.forEach((relativePath, file) => {
-			if (/courses\/.*/.test(relativePath)) {
-				sectionAdds.push(
-					file.async("text").then((value) => {
-						try {
-							for (const sectionData of JSON.parse(value).result) {
-								sections.push(new Section(sectionData));
-							}
-						} catch {
-							// if parsing file text as JSON or Section is invalid, continue
-						}
-					})
-				);
-			}
-		});
-
-		// Wait for all sections to be added to sections array
-		await Promise.all(sectionAdds);
-
-		// Throw error is dataset contains no valid sections
-		if (sections.length === 0) {
-			throw new InsightError("No valid sections");
+		if (kind === InsightDatasetKind.Sections) {
+			entries = await parseSectionsData(data);
+		} else if (kind === InsightDatasetKind.Rooms) {
+			entries = await parseRoomsData(data);
+		} else {
+			throw new InsightError("Invalid InsightDatasetKind");
 		}
 
-		await addToDisk(id, sections);
+		await addToDisk(id, entries);
 		return await getAddedDatasetIDs();
 	}
 
@@ -98,7 +80,7 @@ export default class InsightFacade implements IInsightFacade {
 		const queryObj = query as { WHERE: any; OPTIONS: { COLUMNS: string[]; ORDER?: string } };
 		try {
 			const content = await fs.readJSON(path.join(DATA_DIR, datasetId));
-			const filteredSects = content.sections.filter((section: any) => sectionSatisfies(queryObj.WHERE, section));
+			const filteredSects = content.data.filter((section: any) => sectionSatisfies(queryObj.WHERE, section));
 
 			const columns = queryObj.OPTIONS.COLUMNS;
 			const results = filteredSects.map((section: any) => {
@@ -138,7 +120,7 @@ export default class InsightFacade implements IInsightFacade {
 		for (const fileName of datasetFiles) {
 			datasetPromises.push(
 				fs.readJSON(path.join(DATA_DIR, fileName)).then((content) => {
-					return new Dataset(fileName, InsightDatasetKind.Sections, content.sections.length);
+					return new Dataset(fileName, InsightDatasetKind.Sections, content.data.length);
 				})
 			);
 		}

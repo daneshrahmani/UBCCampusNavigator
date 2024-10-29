@@ -32,6 +32,7 @@ describe("InsightFacade", function () {
 	let noResultKeyDataset: string;
 	let noSectionsDataset: string;
 	let audit1to5001Dataset: string;
+	let rooms: string;
 
 	before(async function () {
 		// This block runs once and loads the datasets.
@@ -42,6 +43,7 @@ describe("InsightFacade", function () {
 		noResultKeyDataset = await getContentFromArchives("noResultKey.zip");
 		noSectionsDataset = await getContentFromArchives("noSections.zip");
 		audit1to5001Dataset = await getContentFromArchives("audit-1-to-5001.zip");
+		rooms = await getContentFromArchives("campus.zip");
 		// Just in case there is anything hanging around from a previous run of the test suite
 		await clearDisk();
 	});
@@ -117,6 +119,13 @@ describe("InsightFacade", function () {
 				expect(expectedResult).to.deep.include(item);
 			});
 		});
+
+		it("Success AddDataset -> Allows adding of rooms dataset", async function () {
+			const result = await facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms);
+
+			expect(result).to.be.an("array");
+		});
+
 		describe("Failure Cases", function () {
 			/////// ID INPUT FAILURE CASES ///////
 			it("addDataset: empty id throws InsightError", async function () {
@@ -327,15 +336,6 @@ describe("InsightFacade", function () {
 						InsightDatasetKind.Sections
 					);
 					return expect(result).to.be.rejectedWith(InsightError);
-				} catch (err) {
-					expect(err).to.be.instanceOf(InsightError);
-				}
-			});
-
-			it("Failure AddDataset -> Rejecting the wrong InsightDatasetKind value", async function () {
-				try {
-					const result = await facade.addDataset("CPSC310", sections, InsightDatasetKind.Rooms);
-					return expect(result).to.eventually.be.rejectedWith(InsightError);
 				} catch (err) {
 					expect(err).to.be.instanceOf(InsightError);
 				}
