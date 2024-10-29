@@ -4,18 +4,18 @@ import { parse } from "parse5";
 import { ChildNode } from "parse5/dist/tree-adapters/default";
 import { relative } from "path";
 
-interface SectionDataObject {
-	id: number;
-	Course: string;
-	Title: string;
-	Professor: string;
-	Subject: string;
-	Year: string;
-	Avg: number;
-	Pass: number;
-	Fail: number;
-	Audit: number;
-	[key: string]: any;
+interface RoomDataObject {
+	fullname: string;
+	shortname: string;
+	number: string;
+	name: string;
+	address: string;
+	lat: number;
+	lon: number;
+	seats: number;
+	type: string;
+	furniture: string;
+	href: string;
 }
 
 interface Building {
@@ -23,6 +23,12 @@ interface Building {
 	shortname: string | undefined;
 	address: string | undefined;
 	link: string | undefined;
+}
+
+interface GeoResponse {
+    lat?: number;
+    lon?: number;
+    error?: string;
 }
 
 export default class Room {
@@ -38,7 +44,7 @@ export default class Room {
 	public readonly furniture: string;
 	public readonly href: string;
 
-	constructor(data: SectionDataObject) {
+	constructor(data: RoomDataObject) {
 		this.fullname = "";
 		this.shortname = "";
 		this.number = "";
@@ -125,7 +131,6 @@ export async function parseRoomsData(data: JSZip) {
 	const buildings: Building[] = getBuildingsFromIndex(index);
 
 	for (const building of buildings) {
-		// TODO make GET request with building.address to get lat and lon
 		if (building.link) {
 			roomAdds.push(
 				data
@@ -134,6 +139,11 @@ export async function parseRoomsData(data: JSZip) {
 					.then((html) => {
 						const buildingInfo = parse(html);
 						// TODO find and parse the room table to create rooms
+						// TODO make GET request with building.address to get lat and lon
+						if (building.address) {
+							const geoLocation = getGeolocation(building.address)
+						}
+						
 						return "nice";
 					})
 			);
@@ -148,4 +158,10 @@ export async function parseRoomsData(data: JSZip) {
 		throw new InsightError("No valid rooms");
 	}
 	return rooms;
+}
+
+async function getGeolocation(address: string): Promise<GeoResponse> {
+	const url = `http://cs310.students.cs.ubc.ca:11316/api/v1/project_team040/${encodeURIComponent(address)}`
+    const res = await fetch(url) 
+    return await res.json();
 }

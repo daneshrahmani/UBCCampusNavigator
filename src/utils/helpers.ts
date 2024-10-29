@@ -51,6 +51,7 @@ export function validateQueryStructure(query: unknown): string {
 	} else {
 		const datasetId = validateOptions(query);
 		validateWhereClause(query.WHERE, datasetId);
+		// TODO create and call validateTransformations (optional to have a transformations clause)
 		return datasetId;
 	}
 }
@@ -89,6 +90,7 @@ export function sectionSatisfies(whereClause: any, section: any): boolean {
 }
 
 export function sortedResults(results: InsightResult[], query: any): InsightResult[] {
+	// TODO change up to accomodate OPTIONS.SORT as per spec
 	const orderingKey = query.OPTIONS.ORDER;
 	return results.sort((a: any, b: any) => {
 		if (a[orderingKey] < b[orderingKey]) {
