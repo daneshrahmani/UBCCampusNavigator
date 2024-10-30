@@ -1,6 +1,7 @@
 import { InsightError } from "../controller/IInsightFacade";
 import JSZip from "jszip";
 import { parse } from "parse5";
+import * as http from "http";
 
 interface RoomDataObject {
 	fullname: string;
@@ -333,14 +334,34 @@ function addRoomsToList(
 // Makes an API GET Request to retrieve a given Building's geolocation data
 // This data will be applied to each resultant Room object from the given building
 async function getGeolocation(address: string): Promise<GeoResponse> {
-	try {
+	return new Promise((resolve) => {
+		const EXPECTED_RESPONSE_CODE = 200;
 		const url = `http://cs310.students.cs.ubc.ca:11316/api/v1/project_team040/${encodeURIComponent(address)}`;
-		const res = await fetch(url);
-		if (!res.ok) {
-			new InsightError(`HTTP error! status: ${res.status}`);
-		}
-		return await res.json();
-	} catch (err) {
-		return { error: String(err) };
-	}
+
+		http
+			.get(url, (res) => {
+				let data = "";
+
+				if (res.statusCode !== EXPECTED_RESPONSE_CODE) {
+					resolve({ error: `HTTP error, status: ${res.statusCode}` });
+					return;
+				}
+
+				res.on("data", (chunk) => {
+					data += chunk;
+				});
+
+				res.on("end", () => {
+					try {
+						const geolocationData = JSON.parse(data) as GeoResponse;
+						resolve(geolocationData);
+					} catch (err) {
+						resolve({ error: String(err) });
+					}
+				});
+			})
+			.on("error", (err) => {
+				resolve({ error: String(err) });
+			});
+	});
 }
