@@ -9,8 +9,8 @@ interface RoomDataObject {
 	number: string | undefined;
 	name: string | undefined;
 	address: string;
-	lat: number;
-	lon: number;
+	lat: number | undefined;
+	lon: number | undefined;
 	seats: number | undefined;
 	type: string | undefined;
 	furniture: string | undefined;
@@ -36,8 +36,8 @@ export default class Room {
 	public readonly number: string | undefined;
 	public readonly name: string | undefined;
 	public readonly address: string;
-	public readonly lat: number;
-	public readonly lon: number;
+	public readonly lat: number | undefined;
+	public readonly lon: number | undefined;
 	public readonly seats: number | undefined;
 	public readonly type: string | undefined;
 	public readonly furniture: string | undefined;
@@ -264,7 +264,7 @@ function createEmptyRoom(): Partial<RoomDataObject> {
 
 // Checks that a Room has all required attributes
 function isValidRoom(room: Partial<RoomDataObject>): boolean {
-	return !!(room.number && room.seats && !isNaN(room.seats) && room.type && room.furniture);
+	return !!(room.number && room.seats && room.type && room.furniture);
 }
 
 // Returns a given nodes column data as text
@@ -300,6 +300,9 @@ async function processBuilding(building: Building, data: JSZip, rooms: Room[]): 
 		}
 
 		const buildingRooms = await getRoomsFromBuilding(buildingFile);
+		if (buildingRooms.length === 0) {
+			return;
+		}
 		addRoomsToList(buildingRooms, building, geoLocation, rooms);
 	} catch {
 		return;
@@ -321,8 +324,8 @@ function addRoomsToList(
 				shortname: building.shortname || "",
 				address: building.address || "",
 				name: `${building.shortname}_${roomData.number}`,
-				lat: geoLocation.lat!,
-				lon: geoLocation.lon!,
+				lat: geoLocation.lat || undefined,
+				lon: geoLocation.lon || undefined,
 			};
 			rooms.push(new Room(fullRoomData));
 		} catch {
