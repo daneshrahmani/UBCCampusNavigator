@@ -92,45 +92,55 @@ export function sectionSatisfies(whereClause: any, section: any): boolean {
 
 export function sortedResults(results: InsightResult[], query: any): InsightResult[] {
 	// TODO change up to accomodate OPTIONS.SORT as per spec
+	const MAX_ORDER_KEYS = 2;
+
 	if (typeof query.OPTIONS.ORDER === "string") {
-		const orderingKey = query.OPTIONS.ORDER;
-		return results.sort((a: any, b: any) => {
-			if (a[orderingKey] < b[orderingKey]) {
-				return -1;
-			}
-			if (a[orderingKey] > b[orderingKey]) {
-				return 1;
-			}
-			return 0;
-		});
+		return simpleSort(results, query.OPTIONS.ORDER);
 	} else if (
 		"dir" in query.OPTIONS.ORDER &&
 		"keys" in query.OPTIONS.ORDER &&
-		Object.keys(query.OPTIONS.ORDER).length == 2
+		Object.keys(query.OPTIONS.ORDER).length === MAX_ORDER_KEYS
 	) {
-		console.log("valid new sort style");
-		if (query.OPTIONS.ORDER.dir !== "DOWN" && query.OPTIONS.ORDER.dir !== "UP") {
-			throw new InsightError("Invalid ORDER direction");
-		}
-		let flipSortDirection = 1;
-		if (query.OPTIONS.ORDER.dir === "DOWN") {
-			flipSortDirection = -1;
-		}
-		results.sort((a: any, b: any) => {
-			for (const key of query.OPTIONS.ORDER.keys) {
-				if (a[key] < b[key]) {
-					return -1 * flipSortDirection;
-				} else if (a[key] > b[key]) {
-					return 1 * flipSortDirection;
-				}
-			}
-			return 0;
-		});
-		console.log(results);
-		return results;
+		return complexSort(results, query.OPTIONS.ORDER);
 	} else {
 		throw new InsightError("Invalid sorting clause");
 	}
+}
+
+function simpleSort(results: InsightResult[], orderingKey: string): InsightResult[] {
+	return results.sort((a: any, b: any) => {
+		if (a[orderingKey] < b[orderingKey]) {
+			return -1;
+		}
+		if (a[orderingKey] > b[orderingKey]) {
+			return 1;
+		}
+		return 0;
+	});
+}
+
+function complexSort(results: InsightResult[], order: any): InsightResult[] {
+	if (order.dir !== "DOWN" && order.dir !== "UP") {
+		throw new InsightError("Invalid ORDER direction");
+	}
+
+	let flipSortDirection = 1;
+	if (order.dir === "DOWN") {
+		flipSortDirection = -1;
+	}
+
+	results.sort((a: any, b: any) => {
+		for (const key of order.keys) {
+			if (a[key] < b[key]) {
+				return -1 * flipSortDirection;
+			} else if (a[key] > b[key]) {
+				return flipSortDirection;
+			}
+		}
+		return 0;
+	});
+
+	return results;
 }
 
 function parseMComparison(mComparison: object): [string, number] {
