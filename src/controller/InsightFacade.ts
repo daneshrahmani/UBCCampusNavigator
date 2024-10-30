@@ -56,7 +56,7 @@ export default class InsightFacade implements IInsightFacade {
 			throw new InsightError("Invalid InsightDatasetKind");
 		}
 
-		await addToDisk(id, entries);
+		await addToDisk(id, entries, kind);
 		return await getAddedDatasetIDs();
 	}
 
@@ -120,7 +120,7 @@ export default class InsightFacade implements IInsightFacade {
 		for (const fileName of datasetFiles) {
 			datasetPromises.push(
 				fs.readJSON(path.join(DATA_DIR, fileName)).then((content) => {
-					return new Dataset(fileName, InsightDatasetKind.Sections, content.data.length);
+					return new Dataset(fileName, content.kind, content.data.length);
 				})
 			);
 		}

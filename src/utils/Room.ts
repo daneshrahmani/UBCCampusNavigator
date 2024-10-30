@@ -127,58 +127,14 @@ async function getRoomsFromBuilding(building: string): Promise<RoomDataObject[]>
 		if (node.nodeName === "tbody") {
 			for (const tbodyChild of node.childNodes) {
 				if (tbodyChild.nodeName === "tr") {
-					const room: Partial<RoomDataObject> = {
-						// Initialize with empty values
-						fullname: "",
-						shortname: "",
-						number: "",
-						name: "",
-						address: "",
-						lat: 0,
-						lon: 0,
-						seats: 0,
-						type: "",
-						furniture: "",
-						href: ""
-					};
+					const room = createEmptyRoom();
 
 					for (const trChild of tbodyChild.childNodes) {
-						if (trChild.nodeName === "td") {
-							for (const attrs of trChild.attrs) {
-								if (attrs.name === "class") {
-									const tdClasses = attrs.value.split(" ");
-									if (tdClasses.includes("views-field")) {
-										if (tdClasses.includes("views-field-field-room-number")) {
-											for (const tdChild of trChild.childNodes) {
-												if (tdChild.nodeName === "a") {
-													// Get href from the link
-													for (const aAttrs of tdChild.attrs) {
-														if (aAttrs.name === "href") {
-															room.href = aAttrs.value;
-														}
-													}
-													room.number = getTextContent(tdChild).trim();
-												}
-											}
-										} else if (tdClasses.includes("views-field-field-room-capacity")) {
-											room.seats = parseInt(getTextContent(trChild).trim(), 10);
-										} else if (tdClasses.includes("views-field-field-room-type")) {
-											room.type = getTextContent(trChild).trim();
-										} else if (tdClasses.includes("views-field-field-room-furniture")) {
-											room.furniture = getTextContent(trChild).trim();
-										}
-									}
-								}
-							}
-						}
+						processRoomCell(trChild, room);
 					}
 
 					// Check if we have valid room data
-					if (room.number &&
-						room.seats &&
-						!isNaN(room.seats) &&
-						room.type &&
-						room.furniture) {
+					if (isValidRoom(room)) {
 						rooms.push(room as RoomDataObject);
 					}
 				}
@@ -190,6 +146,88 @@ async function getRoomsFromBuilding(building: string): Promise<RoomDataObject[]>
 	}
 	return rooms;
 }
+
+export async function parseRoomsData(data: JSZip): Promise<Room[]> {
+	const rooms: Room[] = [];
+
+	const index = await data.file("campus/index.htm")?.async("text");
+
+	if (!index) {
+		throw new InsightError("Invalid rooms dataset");
+	}
+
+	const buildings = getBuildingsFromIndex(index);
+
+	const buildingPromises = buildings
+		.map(async building => processBuilding(building, data, rooms));
+
+	await Promise.all(buildingPromises);
+
+	if (rooms.length === 0) {
+		throw new InsightError("No valid rooms");
+	}
+
+	return rooms;
+}
+
+function processRoomCell(trChild: any, room: Partial<RoomDataObject>): void {
+	if (trChild.nodeName === "td") {
+		for (const attrs of trChild.attrs) {
+			if (attrs.name === "class") {
+				const tdClasses = attrs.value.split(" ");
+				if (tdClasses.includes("views-field")) {
+					if (tdClasses.includes("views-field-field-room-number")) {
+						for (const tdChild of trChild.childNodes) {
+							processRoomNumberCell(tdChild, room);
+						}
+					} else if (tdClasses.includes("views-field-field-room-capacity")) {
+						room.seats = parseInt(getTextContent(trChild).trim(), 10);
+					} else if (tdClasses.includes("views-field-field-room-type")) {
+						room.type = getTextContent(trChild).trim();
+					} else if (tdClasses.includes("views-field-field-room-furniture")) {
+						room.furniture = getTextContent(trChild).trim();
+					}
+				}
+			}
+		}
+	}
+}
+
+function processRoomNumberCell(tdChild: any, room: Partial<RoomDataObject>): void {
+	if (tdChild.nodeName === "a") {
+		for (const aAttrs of tdChild.attrs) {
+			if (aAttrs.name === "href") {
+				room.href = aAttrs.value;
+			}
+		}
+		room.number = getTextContent(tdChild).trim();
+	}
+}
+
+function createEmptyRoom(): Partial<RoomDataObject> {
+	return {
+		fullname: "",
+		shortname: "",
+		number: "",
+		name: "",
+		address: "",
+		lat: 0,
+		lon: 0,
+		seats: 0,
+		type: "",
+		furniture: "",
+		href: ""
+	};
+}
+
+function isValidRoom(room: Partial<RoomDataObject>): boolean {
+	return !!(room.number &&
+		room.seats &&
+		!isNaN(room.seats) &&
+		room.type &&
+		room.furniture);
+}
+
 function getTextContent(node: any): string {
 	if (node.nodeName === "#text") {
 		return node.value || "";
@@ -203,75 +241,61 @@ function getTextContent(node: any): string {
 	return text;
 }
 
-export async function parseRoomsData(data: JSZip): Promise<Room[]> {
-	const rooms: Room[] = [];
-	const roomAdds: Promise<void>[] = [];
-
-	const index = await data.file("campus/index.htm")?.async("text");
-
-	if (index === null || index === undefined) {
-		throw new InsightError("Invalid rooms dataset");
+async function processBuilding(
+	building: Building,
+	data: JSZip,
+	rooms: Room[]
+): Promise<void> {
+	if (!building.link || !building.address) {
+		return;
 	}
 
-	const buildings: Building[] = getBuildingsFromIndex(index);
+	const { link, address } = building;
 
-	for (const building of buildings) {
-		if (building.link && building.address) {
-			const roomPromise = async (): Promise<void> => {
-				if (!building.link || !building.address) {
-					return;
-				}
+	try {
+		const buildingFile = await data
+			.file(link.replace(".", "campus"))
+			?.async("text");
+		if (!buildingFile) {
+			return;
+		}
 
-				try {
-					const buildingFile = await data
-						.file(building.link.replace(".", "campus"))
-						?.async("text");
+		const geoLocation = await getGeolocation(address);
+		if (!geoLocation.lat || !geoLocation.lon) {
+			return;
+		}
 
-					if (!buildingFile) {
-						return;
-					}
+		const buildingRooms = await getRoomsFromBuilding(buildingFile);
+		addRoomsToList(buildingRooms, building, geoLocation, rooms);
+	} catch {
+		return;
+	}
+}
 
-					const geoLocation = await getGeolocation(building.address);
-
-					if (!geoLocation.lat || !geoLocation.lon) {
-						return;
-					}
-
-					const buildingRooms = await getRoomsFromBuilding(buildingFile);
-
-					for (const roomData of buildingRooms) {
-						try {
-							const fullRoomData: RoomDataObject = {
-								...roomData,
-								fullname: building.fullname || "",
-								shortname: building.shortname || "",
-								address: building.address || "",
-								name: `${building.shortname}_${roomData.number}`,
-								lat: geoLocation.lat,
-								lon: geoLocation.lon
-							};
-							rooms.push(new Room(fullRoomData));
-						} catch {
-							// do nothing
-						}
-					}
-				} catch {
-					return;
-				}
+function addRoomsToList(
+	buildingRooms: RoomDataObject[],
+	building: Building,
+	geoLocation: GeoResponse,
+	rooms: Room[]
+): void {
+	for (const roomData of buildingRooms) {
+		try {
+			const fullRoomData: RoomDataObject = {
+				...roomData,
+				fullname: building.fullname || "",
+				shortname: building.shortname || "",
+				address: building.address || "",
+				name: `${building.shortname}_${roomData.number}`,
+				lat: geoLocation.lat!,
+				lon: geoLocation.lon!
 			};
-
-			roomAdds.push(roomPromise());
+			rooms.push(new Room(fullRoomData));
+		} catch {
+			// do nothing
 		}
 	}
-
-	await Promise.all(roomAdds);
-
-	if (rooms.length === 0) {
-		throw new InsightError("No valid rooms");
-	}
-
-	return rooms;
 }
+
 async function getGeolocation(address: string): Promise<GeoResponse> {
 	try {
 		const url = `http://cs310.students.cs.ubc.ca:11316/api/v1/project_team040/${encodeURIComponent(address)}`;
@@ -280,7 +304,7 @@ async function getGeolocation(address: string): Promise<GeoResponse> {
 			new Error(`HTTP error! status: ${res.status}`);
 		}
 		return await res.json();
-	} catch (error) {
-		return { error: String(error) };
+	} catch (err) {
+		return { error: String(err) };
 	}
 }

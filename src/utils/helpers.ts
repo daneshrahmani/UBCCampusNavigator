@@ -14,7 +14,7 @@ export function validateId(id: string): void {
 	}
 }
 
-export async function addToDisk(id: string, data: Section[] | Room[]): Promise<void> {
+export async function addToDisk(id: string, data: Section[] | Room[], kind: InsightDatasetKind): Promise<void> {
 	const datasetFilePath = path.join(DATA_DIR, id);
 	if (await fs.pathExists(datasetFilePath)) {
 		throw new InsightError(`Dataset ${id} already exists in disk memory`);
@@ -22,6 +22,7 @@ export async function addToDisk(id: string, data: Section[] | Room[]): Promise<v
 
 	await fs.writeJson(datasetFilePath, {
 		data: data,
+		kind: kind
 	});
 }
 
