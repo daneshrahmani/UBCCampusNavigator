@@ -51,7 +51,7 @@ export default class Section {
 	}
 }
 
-export async function parseSectionsData(data: JSZip) {
+export async function parseSectionsData(data: JSZip): Promise<Section[]> {
 	const sections: Section[] = [];
 	const sectionAdds: Promise<void>[] = [];
 
