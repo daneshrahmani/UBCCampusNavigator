@@ -1,4 +1,4 @@
-import Section, { parseSectionsData } from "../utils/Section";
+import Section, {parseSectionsData} from "../utils/Section";
 import {
 	addToDisk,
 	getAddedDatasetIDs,
@@ -19,8 +19,8 @@ import {
 import JSZip from "jszip";
 import * as path from "path";
 import * as fs from "fs-extra";
-import { Dataset } from "../utils/Dataset";
-import Room, { parseRoomsData } from "../utils/Room";
+import {Dataset} from "../utils/Dataset";
+import Room, {parseRoomsData} from "../utils/Room";
 
 export const DATA_DIR = path.join(__dirname, "..", "..", "data");
 
@@ -120,7 +120,8 @@ export default class InsightFacade implements IInsightFacade {
 		for (const fileName of datasetFiles) {
 			datasetPromises.push(
 				fs.readJSON(path.join(DATA_DIR, fileName)).then((content) => {
-					return new Dataset(fileName, content.kind, content.data.length);
+					const kind = content.kind === "sections" ? InsightDatasetKind.Sections : InsightDatasetKind.Rooms
+					return new Dataset(fileName, kind, content.data.length);
 				})
 			);
 		}

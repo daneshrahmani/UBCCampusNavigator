@@ -27,7 +27,7 @@ export async function addToDisk(id: string, data: Section[] | Room[], kind: Insi
 }
 
 export async function getAddedDatasetIDs(): Promise<string[]> {
-	return await fs.readdir(DATA_DIR);
+	return fs.readdir(DATA_DIR);
 }
 
 export function validateQueryStructure(query: unknown): string {
