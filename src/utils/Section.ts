@@ -1,4 +1,5 @@
 import { InsightError } from "../controller/IInsightFacade";
+import JSZip from "jszip";
 
 interface SectionDataObject {
 	id: number;
@@ -48,4 +49,34 @@ export default class Section {
 			}
 		});
 	}
+}
+
+export async function parseSectionsData(data: JSZip) {
+	const sections: Section[] = [];
+	const sectionAdds: Promise<void>[] = [];
+
+	data.forEach((relativePath, file) => {
+		if (/courses\/.*/.test(relativePath)) {
+			sectionAdds.push(
+				file.async("text").then((value) => {
+					try {
+						for (const sectionData of JSON.parse(value).result) {
+							sections.push(new Section(sectionData));
+						}
+					} catch {
+						// if parsing file text as JSON or Section is invalid, continue
+					}
+				})
+			);
+		}
+	});
+
+	// Wait for all sections to be added to sections array
+	await Promise.all(sectionAdds);
+
+	// Throw error is dataset contains no valid sections
+	if (sections.length === 0) {
+		throw new InsightError("No valid sections");
+	}
+	return sections;
 }

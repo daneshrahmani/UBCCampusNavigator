@@ -3,6 +3,7 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import Section from "./Section";
 import { DATA_DIR } from "../controller/InsightFacade";
+import Room from "./Room";
 
 export function validateId(id: string): void {
 	// RegExp from ChatGPT
@@ -13,23 +14,15 @@ export function validateId(id: string): void {
 	}
 }
 
-export function addDatasetParameterValidity(id: string, kind: InsightDatasetKind): void {
-	validateId(id);
-
-	// To be removed in a later checkpoint
-	if (kind !== InsightDatasetKind.Sections) {
-		throw new InsightError("Unsupported DatasetKind (for now");
-	}
-}
-
-export async function addToDisk(id: string, sections: Section[]): Promise<void> {
+export async function addToDisk(id: string, data: Section[] | Room[], kind: InsightDatasetKind): Promise<void> {
 	const datasetFilePath = path.join(DATA_DIR, id);
 	if (await fs.pathExists(datasetFilePath)) {
 		throw new InsightError(`Dataset ${id} already exists in disk memory`);
 	}
 
 	await fs.writeJson(datasetFilePath, {
-		sections: sections,
+		data: data,
+		kind: kind,
 	});
 }
 
@@ -59,6 +52,7 @@ export function validateQueryStructure(query: unknown): string {
 	} else {
 		const datasetId = validateOptions(query);
 		validateWhereClause(query.WHERE, datasetId);
+		// TODO create and call validateTransformations (optional to have a transformations clause)
 		return datasetId;
 	}
 }
@@ -97,16 +91,46 @@ export function sectionSatisfies(whereClause: any, section: any): boolean {
 }
 
 export function sortedResults(results: InsightResult[], query: any): InsightResult[] {
-	const orderingKey = query.OPTIONS.ORDER;
-	return results.sort((a: any, b: any) => {
-		if (a[orderingKey] < b[orderingKey]) {
-			return -1;
+	// TODO change up to accomodate OPTIONS.SORT as per spec
+	if (typeof query.OPTIONS.ORDER === "string") {
+		const orderingKey = query.OPTIONS.ORDER;
+		return results.sort((a: any, b: any) => {
+			if (a[orderingKey] < b[orderingKey]) {
+				return -1;
+			}
+			if (a[orderingKey] > b[orderingKey]) {
+				return 1;
+			}
+			return 0;
+		});
+	} else if (
+		"dir" in query.OPTIONS.ORDER &&
+		"keys" in query.OPTIONS.ORDER &&
+		Object.keys(query.OPTIONS.ORDER).length == 2
+	) {
+		console.log("valid new sort style");
+		if (query.OPTIONS.ORDER.dir !== "DOWN" && query.OPTIONS.ORDER.dir !== "UP") {
+			throw new InsightError("Invalid ORDER direction");
 		}
-		if (a[orderingKey] > b[orderingKey]) {
-			return 1;
+		let flipSortDirection = 1;
+		if (query.OPTIONS.ORDER.dir === "DOWN") {
+			flipSortDirection = -1;
 		}
-		return 0;
-	});
+		results.sort((a: any, b: any) => {
+			for (const key of query.OPTIONS.ORDER.keys) {
+				if (a[key] < b[key]) {
+					return -1 * flipSortDirection;
+				} else if (a[key] > b[key]) {
+					return 1 * flipSortDirection;
+				}
+			}
+			return 0;
+		});
+		console.log(results);
+		return results;
+	} else {
+		throw new InsightError("Invalid sorting clause");
+	}
 }
 
 function parseMComparison(mComparison: object): [string, number] {
@@ -134,7 +158,30 @@ function parseSComparison(sComparison: object): [string, RegExp] {
 }
 
 const validFilters = ["NOT", "AND", "OR", "LT", "GT", "EQ", "IS"];
-const validFields = ["avg", "pass", "fail", "audit", "year", "dept", "id", "instructor", "title", "uuid"];
+// TODO: maybe separate these out between room fields and section fields
+const validFields = [
+	"avg",
+	"pass",
+	"fail",
+	"audit",
+	"year",
+	"dept",
+	"id",
+	"instructor",
+	"title",
+	"uuid",
+	"fullname",
+	"shortname",
+	"number",
+	"name",
+	"address",
+	"lat",
+	"lon",
+	"seats",
+	"type",
+	"furniture",
+	"href",
+];
 
 // Validate the options field of the query and return the dataset id
 function validateOptions(query: any): string {
@@ -157,8 +204,10 @@ function validateOptions(query: any): string {
 			throw new InsightError("Invalid column selection");
 		}
 	}
-	if (query.OPTIONS.ORDER && !queryColumns.includes(query.OPTIONS.ORDER)) {
-		throw new InsightError("Order key does not exist in the columns being queried");
+	if (query.OPTIONS.ORDER) {
+		if (typeof query.OPTIONS.ORDER === "string" && !queryColumns.includes(query.OPTIONS.ORDER)) {
+			throw new InsightError("Order key does not exist in the columns being queried");
+		}
 	}
 	return datasetId;
 }
