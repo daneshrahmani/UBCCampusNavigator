@@ -481,6 +481,7 @@ describe("InsightFacade", function () {
 				facade.addDataset("sections", sections, InsightDatasetKind.Sections),
 				facade.addDataset("validDatasetOneCourse", validDatasetOneCourse, InsightDatasetKind.Sections),
 				facade.addDataset("audit1to5001Dataset", audit1to5001Dataset, InsightDatasetKind.Sections),
+				facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms),
 			];
 
 			try {
@@ -492,6 +493,11 @@ describe("InsightFacade", function () {
 
 		after(async function () {
 			await clearDisk();
+		});
+
+		describe("Rooms Queries", function () {
+			it("[valid/simple-rooms.json] Rooms seating more than 300", checkQuery);
+			it("[valid/rooms-sort.json] Sort with order and multiple keys", checkQuery);
 		});
 
 		// Examples demonstrating how to test performQuery using the JSON Test Queries.

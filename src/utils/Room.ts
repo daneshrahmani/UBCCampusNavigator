@@ -26,9 +26,9 @@ interface Building {
 }
 
 interface GeoResponse {
-    lat?: number;
-    lon?: number;
-    error?: string;
+	lat?: number;
+	lon?: number;
+	error?: string;
 }
 
 export default class Room {
@@ -158,8 +158,7 @@ export async function parseRoomsData(data: JSZip): Promise<Room[]> {
 
 	const buildings = getBuildingsFromIndex(index);
 
-	const buildingPromises = buildings
-		.map(async building => processBuilding(building, data, rooms));
+	const buildingPromises = buildings.map(async (building) => processBuilding(building, data, rooms));
 
 	await Promise.all(buildingPromises);
 
@@ -216,16 +215,12 @@ function createEmptyRoom(): Partial<RoomDataObject> {
 		seats: 0,
 		type: "",
 		furniture: "",
-		href: ""
+		href: "",
 	};
 }
 
 function isValidRoom(room: Partial<RoomDataObject>): boolean {
-	return !!(room.number &&
-		room.seats &&
-		!isNaN(room.seats) &&
-		room.type &&
-		room.furniture);
+	return !!(room.number && room.seats && !isNaN(room.seats) && room.type && room.furniture);
 }
 
 function getTextContent(node: any): string {
@@ -241,11 +236,7 @@ function getTextContent(node: any): string {
 	return text;
 }
 
-async function processBuilding(
-	building: Building,
-	data: JSZip,
-	rooms: Room[]
-): Promise<void> {
+async function processBuilding(building: Building, data: JSZip, rooms: Room[]): Promise<void> {
 	if (!building.link || !building.address) {
 		return;
 	}
@@ -253,9 +244,7 @@ async function processBuilding(
 	const { link, address } = building;
 
 	try {
-		const buildingFile = await data
-			.file(link.replace(".", "campus"))
-			?.async("text");
+		const buildingFile = await data.file(link.replace(".", "campus"))?.async("text");
 		if (!buildingFile) {
 			return;
 		}
@@ -287,7 +276,7 @@ function addRoomsToList(
 				address: building.address || "",
 				name: `${building.shortname}_${roomData.number}`,
 				lat: geoLocation.lat!,
-				lon: geoLocation.lon!
+				lon: geoLocation.lon!,
 			};
 			rooms.push(new Room(fullRoomData));
 		} catch {

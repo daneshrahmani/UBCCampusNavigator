@@ -22,7 +22,7 @@ export async function addToDisk(id: string, data: Section[] | Room[], kind: Insi
 
 	await fs.writeJson(datasetFilePath, {
 		data: data,
-		kind: kind
+		kind: kind,
 	});
 }
 
@@ -92,16 +92,42 @@ export function sectionSatisfies(whereClause: any, section: any): boolean {
 
 export function sortedResults(results: InsightResult[], query: any): InsightResult[] {
 	// TODO change up to accomodate OPTIONS.SORT as per spec
-	const orderingKey = query.OPTIONS.ORDER;
-	return results.sort((a: any, b: any) => {
-		if (a[orderingKey] < b[orderingKey]) {
-			return -1;
+	if (typeof query.OPTIONS.ORDER === "string") {
+		const orderingKey = query.OPTIONS.ORDER;
+		return results.sort((a: any, b: any) => {
+			if (a[orderingKey] < b[orderingKey]) {
+				return -1;
+			}
+			if (a[orderingKey] > b[orderingKey]) {
+				return 1;
+			}
+			return 0;
+		});
+	}
+	else if ("dir" in query.OPTIONS.ORDER && "keys" in query.OPTIONS.ORDER && Object.keys(query.OPTIONS.ORDER).length == 2) {
+		console.log("valid new sort style")
+		if (query.OPTIONS.ORDER.dir !== "DOWN" && query.OPTIONS.ORDER.dir !== "UP") {
+			throw new InsightError("Invalid ORDER direction")
 		}
-		if (a[orderingKey] > b[orderingKey]) {
-			return 1;
+		let flipSortDirection = 1
+		if (query.OPTIONS.ORDER.dir === "DOWN") {
+			flipSortDirection = -1;
 		}
-		return 0;
-	});
+		results.sort((a: any, b: any) => {
+			for (const key of query.OPTIONS.ORDER.keys) {
+				if (a[key] < b [key]) {
+					return -1 * flipSortDirection;
+				} else if (a[key] > b[key]) {
+					return 1 * flipSortDirection;
+				}
+			}
+			return 0;
+		})
+		console.log(results)
+		return results
+	} else {
+		throw new InsightError("Invalid sorting clause")
+	}
 }
 
 function parseMComparison(mComparison: object): [string, number] {
@@ -129,7 +155,30 @@ function parseSComparison(sComparison: object): [string, RegExp] {
 }
 
 const validFilters = ["NOT", "AND", "OR", "LT", "GT", "EQ", "IS"];
-const validFields = ["avg", "pass", "fail", "audit", "year", "dept", "id", "instructor", "title", "uuid"];
+// TODO: maybe separate these out between room fields and section fields
+const validFields = [
+	"avg",
+	"pass",
+	"fail",
+	"audit",
+	"year",
+	"dept",
+	"id",
+	"instructor",
+	"title",
+	"uuid",
+	"fullname",
+	"shortname",
+	"number",
+	"name",
+	"address",
+	"lat",
+	"lon",
+	"seats",
+	"type",
+	"furniture",
+	"href",
+];
 
 // Validate the options field of the query and return the dataset id
 function validateOptions(query: any): string {
@@ -152,8 +201,11 @@ function validateOptions(query: any): string {
 			throw new InsightError("Invalid column selection");
 		}
 	}
-	if (query.OPTIONS.ORDER && !queryColumns.includes(query.OPTIONS.ORDER)) {
-		throw new InsightError("Order key does not exist in the columns being queried");
+	if (query.OPTIONS.ORDER) {
+		if (typeof query.OPTIONS.ORDER === "string" && !queryColumns.includes(query.OPTIONS.ORDER)) {
+			throw new InsightError("Order key does not exist in the columns being queried");	
+		}
+		
 	}
 	return datasetId;
 }
