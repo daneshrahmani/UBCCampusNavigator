@@ -1,8 +1,8 @@
 import { InsightError } from "../controller/IInsightFacade";
 import JSZip from "jszip";
 import { parse } from "parse5";
-import { ChildNode } from "parse5/dist/tree-adapters/default";
-import { relative } from "path";
+// import { ChildNode } from "parse5/dist/tree-adapters/default";
+// import { relative } from "path";
 
 interface RoomDataObject {
 	fullname: string;
@@ -34,28 +34,28 @@ interface GeoResponse {
 export default class Room {
 	public readonly fullname: string;
 	public readonly shortname: string;
-	public readonly number: string;
-	public readonly name: string;
+	public readonly number: string | undefined;
+	public readonly name: string | undefined;
 	public readonly address: string;
 	public readonly lat: number;
 	public readonly lon: number;
-	public readonly seats: number;
-	public readonly type: string;
-	public readonly furniture: string;
-	public readonly href: string;
+	public readonly seats: number | undefined;
+	public readonly type: string | undefined;
+	public readonly furniture: string | undefined;
+	public readonly href: string | undefined;
 
 	constructor(data: RoomDataObject) {
-		this.fullname = "";
-		this.shortname = "";
-		this.number = "";
-		this.name = "";
-		this.address = "";
-		this.lat = 0;
-		this.lon = 0;
-		this.seats = 0;
-		this.type = "";
-		this.furniture = "";
-		this.href = "";
+		this.fullname = data.fullname;
+		this.shortname = data.shortname;
+		this.number = data.number;
+		this.name = data.name;
+		this.address = data.address;
+		this.lat = data.lat;
+		this.lon = data.lon;
+		this.seats = data.seats;
+		this.type = data.type;
+		this.furniture = data.furniture;
+		this.href = data.href;
 	}
 }
 
@@ -64,7 +64,7 @@ function getBuildingsFromIndex(index: string) {
 	const nodeQueue = parse(index).childNodes;
 	let node = nodeQueue.shift();
 
-	while (node != undefined) {
+	while (node !== undefined) {
 		if (node.nodeName === "tbody") {
 			for (const tbodyChild of node.childNodes) {
 				if (tbodyChild.nodeName === "tr") {
@@ -118,50 +118,169 @@ function getBuildingsFromIndex(index: string) {
 	return buildings;
 }
 
-export async function parseRoomsData(data: JSZip) {
+async function getRoomsFromBuilding(building: string): Promise<RoomDataObject[]> {
+	const rooms: RoomDataObject[] = [];
+	const nodeQueue = parse(building).childNodes;
+	let node = nodeQueue.shift();
+
+	while (node !== undefined) {
+		if (node.nodeName === "tbody") {
+			for (const tbodyChild of node.childNodes) {
+				if (tbodyChild.nodeName === "tr") {
+					const room: Partial<RoomDataObject> = {
+						// Initialize with empty values
+						fullname: "",
+						shortname: "",
+						number: "",
+						name: "",
+						address: "",
+						lat: 0,
+						lon: 0,
+						seats: 0,
+						type: "",
+						furniture: "",
+						href: ""
+					};
+
+					for (const trChild of tbodyChild.childNodes) {
+						if (trChild.nodeName === "td") {
+							for (const attrs of trChild.attrs) {
+								if (attrs.name === "class") {
+									const tdClasses = attrs.value.split(" ");
+									if (tdClasses.includes("views-field")) {
+										if (tdClasses.includes("views-field-field-room-number")) {
+											for (const tdChild of trChild.childNodes) {
+												if (tdChild.nodeName === "a") {
+													// Get href from the link
+													for (const aAttrs of tdChild.attrs) {
+														if (aAttrs.name === "href") {
+															room.href = aAttrs.value;
+														}
+													}
+													room.number = getTextContent(tdChild).trim();
+												}
+											}
+										} else if (tdClasses.includes("views-field-field-room-capacity")) {
+											room.seats = parseInt(getTextContent(trChild).trim(), 10);
+										} else if (tdClasses.includes("views-field-field-room-type")) {
+											room.type = getTextContent(trChild).trim();
+										} else if (tdClasses.includes("views-field-field-room-furniture")) {
+											room.furniture = getTextContent(trChild).trim();
+										}
+									}
+								}
+							}
+						}
+					}
+
+					// Check if we have valid room data
+					if (room.number &&
+						room.seats &&
+						!isNaN(room.seats) &&
+						room.type &&
+						room.furniture) {
+						rooms.push(room as RoomDataObject);
+					}
+				}
+			}
+		} else if ("childNodes" in node) {
+			nodeQueue.push(...node.childNodes);
+		}
+		node = nodeQueue.shift();
+	}
+	return rooms;
+}
+function getTextContent(node: any): string {
+	if (node.nodeName === "#text") {
+		return node.value || "";
+	}
+	let text = "";
+	if (node.childNodes) {
+		for (const child of node.childNodes) {
+			text += getTextContent(child);
+		}
+	}
+	return text;
+}
+
+export async function parseRoomsData(data: JSZip): Promise<Room[]> {
 	const rooms: Room[] = [];
-	const roomAdds: (Promise<string> | undefined)[] = [];
+	const roomAdds: Promise<void>[] = [];
 
 	const index = await data.file("campus/index.htm")?.async("text");
 
 	if (index === null || index === undefined) {
-		throw new InsightError("Invalid rooms datastet");
+		throw new InsightError("Invalid rooms dataset");
 	}
 
 	const buildings: Building[] = getBuildingsFromIndex(index);
 
 	for (const building of buildings) {
-		if (building.link) {
-			roomAdds.push(
-				data
-					.file(building.link.replace(".", "campus"))
-					?.async("text")
-					.then((html) => {
-						const buildingInfo = parse(html);
-						// TODO find and parse the room table to create rooms
-						// TODO make GET request with building.address to get lat and lon
-						if (building.address) {
-							const geoLocation = getGeolocation(building.address)
+		if (building.link && building.address) {
+			const roomPromise = async (): Promise<void> => {
+				if (!building.link || !building.address) {
+					return;
+				}
+
+				try {
+					const buildingFile = await data
+						.file(building.link.replace(".", "campus"))
+						?.async("text");
+
+					if (!buildingFile) {
+						return;
+					}
+
+					const geoLocation = await getGeolocation(building.address);
+
+					if (!geoLocation.lat || !geoLocation.lon) {
+						return;
+					}
+
+					const buildingRooms = await getRoomsFromBuilding(buildingFile);
+
+					for (const roomData of buildingRooms) {
+						try {
+							const fullRoomData: RoomDataObject = {
+								...roomData,
+								fullname: building.fullname || "",
+								shortname: building.shortname || "",
+								address: building.address || "",
+								name: `${building.shortname}_${roomData.number}`,
+								lat: geoLocation.lat,
+								lon: geoLocation.lon
+							};
+							rooms.push(new Room(fullRoomData));
+						} catch {
+							// do nothing
 						}
-						
-						return "nice";
-					})
-			);
+					}
+				} catch {
+					return;
+				}
+			};
+
+			roomAdds.push(roomPromise());
 		}
 	}
 
-	// Wait for all sections to be added to sections array
 	await Promise.all(roomAdds);
 
-	// Throw error is dataset contains no valid sections
 	if (rooms.length === 0) {
 		throw new InsightError("No valid rooms");
 	}
+
 	return rooms;
 }
-
 async function getGeolocation(address: string): Promise<GeoResponse> {
-	const url = `http://cs310.students.cs.ubc.ca:11316/api/v1/project_team040/${encodeURIComponent(address)}`
-    const res = await fetch(url) 
-    return await res.json();
+	try {
+		const url = `http://cs310.students.cs.ubc.ca:11316/api/v1/project_team040/${encodeURIComponent(address)}`;
+		const res = await fetch(url);
+		if (!res.ok) {
+			new Error(`HTTP error! status: ${res.status}`);
+		}
+		return await res.json();
+	} catch (error) {
+		return { error: String(error) };
+	}
 }
