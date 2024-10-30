@@ -103,30 +103,33 @@ export function sortedResults(results: InsightResult[], query: any): InsightResu
 			}
 			return 0;
 		});
-	}
-	else if ("dir" in query.OPTIONS.ORDER && "keys" in query.OPTIONS.ORDER && Object.keys(query.OPTIONS.ORDER).length == 2) {
-		console.log("valid new sort style")
+	} else if (
+		"dir" in query.OPTIONS.ORDER &&
+		"keys" in query.OPTIONS.ORDER &&
+		Object.keys(query.OPTIONS.ORDER).length == 2
+	) {
+		console.log("valid new sort style");
 		if (query.OPTIONS.ORDER.dir !== "DOWN" && query.OPTIONS.ORDER.dir !== "UP") {
-			throw new InsightError("Invalid ORDER direction")
+			throw new InsightError("Invalid ORDER direction");
 		}
-		let flipSortDirection = 1
+		let flipSortDirection = 1;
 		if (query.OPTIONS.ORDER.dir === "DOWN") {
 			flipSortDirection = -1;
 		}
 		results.sort((a: any, b: any) => {
 			for (const key of query.OPTIONS.ORDER.keys) {
-				if (a[key] < b [key]) {
+				if (a[key] < b[key]) {
 					return -1 * flipSortDirection;
 				} else if (a[key] > b[key]) {
 					return 1 * flipSortDirection;
 				}
 			}
 			return 0;
-		})
-		console.log(results)
-		return results
+		});
+		console.log(results);
+		return results;
 	} else {
-		throw new InsightError("Invalid sorting clause")
+		throw new InsightError("Invalid sorting clause");
 	}
 }
 
@@ -203,9 +206,8 @@ function validateOptions(query: any): string {
 	}
 	if (query.OPTIONS.ORDER) {
 		if (typeof query.OPTIONS.ORDER === "string" && !queryColumns.includes(query.OPTIONS.ORDER)) {
-			throw new InsightError("Order key does not exist in the columns being queried");	
+			throw new InsightError("Order key does not exist in the columns being queried");
 		}
-		
 	}
 	return datasetId;
 }
