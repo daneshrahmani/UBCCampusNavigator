@@ -2,7 +2,7 @@ import { InsightError, InsightDatasetKind, InsightResult } from "../controller/I
 import * as fs from "fs-extra";
 import * as path from "path";
 import Section from "./Section";
-import { DATA_DIR } from "../controller/InsightFacade";
+import InsightFacade, { DATA_DIR } from "../controller/InsightFacade";
 import Room from "./Room";
 
 export function validateId(id: string): void {
@@ -269,7 +269,6 @@ function validateLogicFilters(logicFilter: any): void {
 }
 
 function validateNonLogicFilters(key: any, val: any): void {
-	const stringFields = ["dept", "id", "instructor", "title", "uuid"];
 	const [[objectKey], [objectValue]] = [Object.keys(val), Object.values(val)];
 
 	switch (key) {
@@ -278,14 +277,16 @@ function validateNonLogicFilters(key: any, val: any): void {
 			break;
 		case "EQ":
 		case "GT":
-		case "LT":
+		case "LT": {
+			validateNumericComparators(objectKey, objectValue);
+			break;
+		}
 		case "MAX":
 		case "MIN":
 		case "AVG":
-		case "SUM": {
-			validateNumericComparators(objectKey, stringFields, objectValue);
+		case "SUM":
+			validateApplyTokens(objectKey, objectValue);
 			break;
-		}
 		case "IS": {
 			// Check that IS value is a string type
 			if (typeof objectValue !== "string") {
@@ -304,19 +305,34 @@ function validateNonLogicFilters(key: any, val: any): void {
 	}
 }
 
-// Validating Keys and Values for EQ, GT, LT, MAX, MIN, AVG, SUM
-function validateNumericComparators(objectKey: any, stringFields: string[], objectValue: any): void {
+// Validating Keys and Values for EQ, GT, LT
+function validateNumericComparators(objectKey: any, objectValue: any): void {
+	const stringFieldsSections = ["dept", "id", "instructor", "title", "uuid",
+	"fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
 	// Checking that Key exists and is not a string type
 	if (!objectKey) {
-		throw new InsightError("Missing key for EQ, GT, LT, MAX, MIN, AVG, SUM");
+		throw new InsightError("Missing key for EQ, GT, or LT");
 	}
 	const field = objectKey.split("_");
-	if (field.length > 1 && stringFields.includes(field[1])) {
-		throw new InsightError("Invalid Key type for EQ, GT, LT, MAX, MIN, AVG, SUM");
+	if (field.length > 1 && stringFieldsSections.includes(field[1])) {
+		throw new InsightError("Invalid Key type for EQ, GT, or LT");
 	}
 
-	// Checking that Value is of type Number
+	// Checking that Value is a number
 	if (typeof objectValue !== "number") {
-		throw new InsightError("Invalid Value type for EQ, GT, LT, MAX, MIN, AVG, SUM. Value type must be a number");
+		throw new InsightError("Invalid Value type for EQ, GT, LT. Value type must be a number");
+	}
+}
+
+function validateApplyTokens(objectKey: any, objectValue: any): void {
+	const validTokenValues = ["lat", "lon", "seats", "year", "avg", "pass", "fail", "audit"]
+
+	if (!objectKey) {
+		throw new InsightError("Missing key for EQ, GT, or LT");
+	}
+
+	// Checking that MAX, MIN, SUM, AVG value column is a numeric type
+	if (!validTokenValues.includes(objectValue.split("_")[1])) {
+		throw new InsightError("Invalid Value type for MAX, MIN, AVG, SUM. Value type must be numeric column")
 	}
 }
