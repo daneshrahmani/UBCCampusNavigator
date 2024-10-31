@@ -2,8 +2,11 @@ import { InsightError, InsightDatasetKind, InsightResult } from "../controller/I
 import * as fs from "fs-extra";
 import * as path from "path";
 import Section from "./Section";
-import InsightFacade, { DATA_DIR } from "../controller/InsightFacade";
+import { DATA_DIR } from "../controller/InsightFacade";
 import Room from "./Room";
+import Decimal from "decimal.js";
+
+const ROUND_TO = 2;
 
 export function validateId(id: string): void {
 	// RegExp from ChatGPT
@@ -77,13 +80,14 @@ function validateApplyClause(query: any, applyColumns: string[], datasetId: stri
 			throw new InsightError("Invalid APPLYRULE");
 		}
 		const applyToken = Object.keys(rule[key])[0];
+		validateNonLogicFilters(applyToken, rule[key][applyToken]);
 		if (!validApplyTokens.includes(applyToken)) {
 			throw new InsightError("Invalid APPLYTOKEN");
 		}
 		const dataKey = rule[key][applyToken];
 
 		const dataKeyParts = dataKey.split("_");
-		const expectedNumKeyParts = 2
+		const expectedNumKeyParts = 2;
 		if (dataKeyParts.length !== expectedNumKeyParts) {
 			throw new InsightError("Invalid data reference");
 		}
@@ -93,14 +97,13 @@ function validateApplyClause(query: any, applyColumns: string[], datasetId: stri
 			throw new InsightError("Query references multiple datasets");
 		}
 	}
-	return datasetId
+	return datasetId;
 }
 
 function validateTransformations(query: any, datasetId: string | null): any {
 	const groupColumns: string[] = [];
 	const applyColumns: string[] = [];
 	if (query.TRANSFORMATIONS) {
-		
 		datasetId = validateApplyClause(query, applyColumns, datasetId);
 
 		if (query.TRANSFORMATIONS.GROUP.length === 0) {
@@ -108,7 +111,7 @@ function validateTransformations(query: any, datasetId: string | null): any {
 		}
 		for (const dataKey of query.TRANSFORMATIONS.GROUP) {
 			const dataKeyParts = dataKey.split("_");
-			const expectedNumKeyParts = 2
+			const expectedNumKeyParts = 2;
 			if (dataKeyParts.length !== expectedNumKeyParts) {
 				throw new InsightError("Invalid data reference");
 			}
@@ -156,8 +159,93 @@ export function sectionSatisfies(whereClause: any, section: any): boolean {
 	}
 }
 
-export function transformResults(results: any) {
-	console.log(results);
+function hashEntry(entry: any, groupingFields: any): string {
+	let entryHash = "";
+	for (const field of groupingFields) {
+		entryHash += `~${entry[field]}`;
+	}
+	return entryHash;
+}
+
+export function selectColumns(section: any, columns: any): any {
+	const result: InsightResult = {};
+	for (const column of columns) {
+		// Array destructuring from ChatGPT
+		const [, field] = column.split("_");
+		result[column] = section[field];
+	}
+	return result;
+}
+
+export function transformResults(queryObj: any, filteredSects: any): any {
+	const groupingFields = queryObj.TRANSFORMATIONS.GROUP.map((datasetAttribute: any) => {
+		return datasetAttribute.split("_")[1];
+	});
+	const groups = new Map();
+	for (const entry of filteredSects) {
+		const hashedEntry = hashEntry(entry, groupingFields);
+		if (groups.has(hashedEntry)) {
+			const groupEntries = groups.get(hashedEntry);
+			groupEntries.push(entry);
+			groups.set(hashedEntry, groupEntries);
+		} else {
+			groups.set(hashedEntry, [entry]);
+		}
+	}
+	const results = [];
+	for (const group of groups.values()) {
+		const result: any = {};
+		for (const column of queryObj.OPTIONS.COLUMNS) {
+			if (queryObj.TRANSFORMATIONS.GROUP.includes(column)) {
+				const attribute = column.split("_")[1];
+				result[column] = group[0][attribute];
+			} else {
+				for (const applyRule of queryObj.TRANSFORMATIONS.APPLY) {
+					const ruleName = Object.keys(applyRule)[0];
+					if (ruleName === column) {
+						const fn = Object.keys(applyRule[ruleName])[0];
+						const datasetField: any = Object.values(applyRule[ruleName])[0];
+						const field = datasetField.split("_")[1];
+
+						if (fn === "MIN") {
+							let min = Infinity;
+							for (const entry of group) {
+								if (entry[field] < min) {
+									min = entry[field];
+								}
+							}
+							result[column] = min;
+						} else if (fn === "MAX") {
+							let max = -Infinity;
+							for (const entry of group) {
+								if (entry[field] > max) {
+									max = entry[field];
+								}
+							}
+							result[column] = max;
+						} else if (fn === "SUM") {
+							let sum = 0;
+							for (const entry of group) {
+								sum += entry[field];
+							}
+							result[column] = Number(sum.toFixed(ROUND_TO));
+						} else if (fn === "AVG") {
+							let total = new Decimal(0);
+							for (const entry of group) {
+								total = total.add(new Decimal(entry[field]));
+							}
+							const avg = total.toNumber() / group.length;
+							result[column] = Number(avg.toFixed(ROUND_TO));
+						} else if (fn === "COUNT") {
+							result[column] = group.length;
+						}
+					}
+				}
+			}
+		}
+		results.push(result);
+	}
+	return results;
 }
 
 export function sortedResults(results: InsightResult[], query: any): InsightResult[] {
@@ -264,7 +352,7 @@ const validFields = [
 ];
 
 // Validate the options field of the query and return the dataset id
-function validateOptions(query: any, datasetId: any, transformationsColumns: any) {
+function validateOptions(query: any, datasetId: any, transformationsColumns: any): string | null {
 	const queryColumns = query.OPTIONS.COLUMNS;
 
 	if (transformationsColumns.length !== 0) {
@@ -363,7 +451,7 @@ function validateNonLogicFilters(key: any, val: any): void {
 		case "MIN":
 		case "AVG":
 		case "SUM":
-			validateApplyTokens(objectKey, objectValue);
+			validateApplyTokens(key, val);
 			break;
 		case "IS": {
 			// Check that IS value is a string type
@@ -385,8 +473,21 @@ function validateNonLogicFilters(key: any, val: any): void {
 
 // Validating Keys and Values for EQ, GT, LT
 function validateNumericComparators(objectKey: any, objectValue: any): void {
-	const stringFieldsSections = ["dept", "id", "instructor", "title", "uuid",
-	"fullname", "shortname", "number", "name", "address", "type", "furniture", "href"];
+	const stringFieldsSections = [
+		"dept",
+		"id",
+		"instructor",
+		"title",
+		"uuid",
+		"fullname",
+		"shortname",
+		"number",
+		"name",
+		"address",
+		"type",
+		"furniture",
+		"href",
+	];
 	// Checking that Key exists and is not a string type
 	if (!objectKey) {
 		throw new InsightError("Missing key for EQ, GT, or LT");
@@ -403,7 +504,7 @@ function validateNumericComparators(objectKey: any, objectValue: any): void {
 }
 
 function validateApplyTokens(objectKey: any, objectValue: any): void {
-	const validTokenValues = ["lat", "lon", "seats", "year", "avg", "pass", "fail", "audit"]
+	const validTokenValues = ["lat", "lon", "seats", "year", "avg", "pass", "fail", "audit"];
 
 	if (!objectKey) {
 		throw new InsightError("Missing key for EQ, GT, or LT");
@@ -411,6 +512,6 @@ function validateApplyTokens(objectKey: any, objectValue: any): void {
 
 	// Checking that MAX, MIN, SUM, AVG value column is a numeric type
 	if (!validTokenValues.includes(objectValue.split("_")[1])) {
-		throw new InsightError("Invalid Value type for MAX, MIN, AVG, SUM. Value type must be numeric column")
+		throw new InsightError("Invalid Value type for MAX, MIN, AVG, SUM. Value type must be numeric column");
 	}
 }

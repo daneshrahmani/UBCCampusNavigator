@@ -3,6 +3,7 @@ import {
 	addToDisk,
 	getAddedDatasetIDs,
 	sectionSatisfies,
+	selectColumns,
 	sortedResults,
 	transformResults,
 	validateId,
@@ -24,6 +25,8 @@ import { Dataset } from "../utils/Dataset";
 import Room, { parseRoomsData } from "../utils/Room";
 
 export const DATA_DIR = path.join(__dirname, "..", "..", "data");
+
+const maximumResultLength = 5000;
 
 /**
  * This is the main programmatic entry point for the project.
@@ -76,7 +79,6 @@ export default class InsightFacade implements IInsightFacade {
 
 	public async performQuery(query: unknown): Promise<InsightResult[]> {
 		const datasetId = validateQueryStructure(query);
-		const maximumResultLength = 5000;
 		const queryObj = query as {
 			WHERE: any;
 			OPTIONS: { COLUMNS: string[]; ORDER?: string };
@@ -86,20 +88,14 @@ export default class InsightFacade implements IInsightFacade {
 			const content = await fs.readJSON(path.join(DATA_DIR, datasetId));
 			const filteredEntries = content.data.filter((section: any) => sectionSatisfies(queryObj.WHERE, section));
 
-			if (queryObj.TRANSFORMATIONS) {
-				transformResults(filteredSects);
-			}
+			let results;
 
-			const columns = queryObj.OPTIONS.COLUMNS;
-			const results = filteredEntries.map((section: any) => {
-				const result: InsightResult = {};
-				for (const column of columns) {
-					// Array destructuring from ChatGPT
-					const [, field] = column.split("_");
-					result[column] = section[field];
-				}
-				return result;
-			});
+			if (queryObj.TRANSFORMATIONS) {
+				results = transformResults(queryObj, filteredEntries);
+			} else {
+				const columns = queryObj.OPTIONS.COLUMNS;
+				results = filteredEntries.map((section: any) => selectColumns(section, columns));
+			}
 
 			if (results.length > maximumResultLength) {
 				throw new ResultTooLargeError("Query is returning more than 5000 items");
