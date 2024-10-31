@@ -1,7 +1,7 @@
 import { InsightError } from "../controller/IInsightFacade";
 import JSZip from "jszip";
 import { parse } from "parse5";
-import * as http from "http";
+import { GeoResponse, getGeolocation } from "./GeoLocation";
 
 interface RoomDataObject {
 	fullname: string;
@@ -22,12 +22,6 @@ interface Building {
 	shortname: string | undefined;
 	address: string | undefined;
 	link: string | undefined;
-}
-
-interface GeoResponse {
-	lat?: number;
-	lon?: number;
-	error?: string;
 }
 
 export default class Room {
@@ -264,7 +258,9 @@ function createEmptyRoom(): Partial<RoomDataObject> {
 
 // Checks that a Room has all required attributes
 function isValidRoom(room: Partial<RoomDataObject>): boolean {
-	return !!(room.number && room.seats && room.type && room.furniture);
+	return (
+		room.number !== undefined && room.seats !== undefined && room.type !== undefined && room.furniture !== undefined
+	);
 }
 
 // Returns a given nodes column data as text
@@ -289,7 +285,8 @@ async function processBuilding(building: Building, data: JSZip, rooms: Room[]): 
 	const { link, address } = building;
 
 	try {
-		const buildingFile = await data.file(link.substring(2))?.async("text");
+		const charsToStrip = 2;
+		const buildingFile = await data.file(link.substring(charsToStrip))?.async("text");
 		if (!buildingFile) {
 			return;
 		}
@@ -332,39 +329,4 @@ function addRoomsToList(
 			// do nothing
 		}
 	}
-}
-
-// Makes an API GET Request to retrieve a given Building's geolocation data
-// This data will be applied to each resultant Room object from the given building
-async function getGeolocation(address: string): Promise<GeoResponse> {
-	return new Promise((resolve) => {
-		const EXPECTED_RESPONSE_CODE = 200;
-		const url = `http://cs310.students.cs.ubc.ca:11316/api/v1/project_team040/${encodeURIComponent(address)}`;
-
-		http
-			.get(url, (res) => {
-				let data = "";
-
-				if (res.statusCode !== EXPECTED_RESPONSE_CODE) {
-					resolve({ error: `HTTP error, status: ${res.statusCode}` });
-					return;
-				}
-
-				res.on("data", (chunk) => {
-					data += chunk;
-				});
-
-				res.on("end", () => {
-					try {
-						const geolocationData = JSON.parse(data) as GeoResponse;
-						resolve(geolocationData);
-					} catch (err) {
-						resolve({ error: String(err) });
-					}
-				});
-			})
-			.on("error", (err) => {
-				resolve({ error: String(err) });
-			});
-	});
 }
