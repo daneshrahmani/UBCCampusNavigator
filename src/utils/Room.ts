@@ -140,7 +140,12 @@ function createEmptyBuilding(): Building {
 
 // Checks that all required Building Fields exist
 function isValidBuilding(building: Building): boolean {
-	return !!(building.address && building.fullname && building.shortname && building.link);
+	return (
+		building.address !== undefined &&
+		building.fullname !== undefined &&
+		building.shortname !== undefined &&
+		building.link !== undefined
+	);
 }
 
 //////////////////////////////////////////////////////////////////////////////////
