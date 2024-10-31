@@ -1,7 +1,7 @@
 import { InsightError } from "../controller/IInsightFacade";
 import JSZip from "jszip";
 import { parse } from "parse5";
-import * as http from "http";
+import { GeoResponse, getGeolocation } from "./GeoLocation";
 
 interface RoomDataObject {
 	fullname: string;
@@ -9,8 +9,8 @@ interface RoomDataObject {
 	number: string | undefined;
 	name: string | undefined;
 	address: string;
-	lat: number;
-	lon: number;
+	lat: number | undefined;
+	lon: number | undefined;
 	seats: number | undefined;
 	type: string | undefined;
 	furniture: string | undefined;
@@ -24,20 +24,14 @@ interface Building {
 	link: string | undefined;
 }
 
-interface GeoResponse {
-	lat?: number;
-	lon?: number;
-	error?: string;
-}
-
 export default class Room {
 	public readonly fullname: string;
 	public readonly shortname: string;
 	public readonly number: string | undefined;
 	public readonly name: string | undefined;
 	public readonly address: string;
-	public readonly lat: number;
-	public readonly lon: number;
+	public readonly lat: number | undefined;
+	public readonly lon: number | undefined;
 	public readonly seats: number | undefined;
 	public readonly type: string | undefined;
 	public readonly furniture: string | undefined;
@@ -146,7 +140,12 @@ function createEmptyBuilding(): Building {
 
 // Checks that all required Building Fields exist
 function isValidBuilding(building: Building): boolean {
-	return !!(building.address && building.fullname && building.shortname && building.link);
+	return (
+		building.address !== undefined &&
+		building.fullname !== undefined &&
+		building.shortname !== undefined &&
+		building.link !== undefined
+	);
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -189,7 +188,7 @@ async function getRoomsFromBuilding(building: string): Promise<RoomDataObject[]>
 export async function parseRoomsData(data: JSZip): Promise<Room[]> {
 	const rooms: Room[] = [];
 
-	const index = await data.file("campus/index.htm")?.async("text");
+	const index = await data.file("index.htm")?.async("text");
 
 	if (!index) {
 		throw new InsightError("Invalid rooms dataset");
@@ -264,7 +263,9 @@ function createEmptyRoom(): Partial<RoomDataObject> {
 
 // Checks that a Room has all required attributes
 function isValidRoom(room: Partial<RoomDataObject>): boolean {
-	return !!(room.number && room.seats && !isNaN(room.seats) && room.type && room.furniture);
+	return (
+		room.number !== undefined && room.seats !== undefined && room.type !== undefined && room.furniture !== undefined
+	);
 }
 
 // Returns a given nodes column data as text
@@ -289,7 +290,8 @@ async function processBuilding(building: Building, data: JSZip, rooms: Room[]): 
 	const { link, address } = building;
 
 	try {
-		const buildingFile = await data.file(link.replace(".", "campus"))?.async("text");
+		const charsToStrip = 2;
+		const buildingFile = await data.file(link.substring(charsToStrip))?.async("text");
 		if (!buildingFile) {
 			return;
 		}
@@ -300,6 +302,9 @@ async function processBuilding(building: Building, data: JSZip, rooms: Room[]): 
 		}
 
 		const buildingRooms = await getRoomsFromBuilding(buildingFile);
+		if (buildingRooms.length === 0) {
+			return;
+		}
 		addRoomsToList(buildingRooms, building, geoLocation, rooms);
 	} catch {
 		return;
@@ -321,47 +326,12 @@ function addRoomsToList(
 				shortname: building.shortname || "",
 				address: building.address || "",
 				name: `${building.shortname}_${roomData.number}`,
-				lat: geoLocation.lat!,
-				lon: geoLocation.lon!,
+				lat: geoLocation.lat || undefined,
+				lon: geoLocation.lon || undefined,
 			};
 			rooms.push(new Room(fullRoomData));
 		} catch {
 			// do nothing
 		}
 	}
-}
-
-// Makes an API GET Request to retrieve a given Building's geolocation data
-// This data will be applied to each resultant Room object from the given building
-async function getGeolocation(address: string): Promise<GeoResponse> {
-	return new Promise((resolve) => {
-		const EXPECTED_RESPONSE_CODE = 200;
-		const url = `http://cs310.students.cs.ubc.ca:11316/api/v1/project_team040/${encodeURIComponent(address)}`;
-
-		http
-			.get(url, (res) => {
-				let data = "";
-
-				if (res.statusCode !== EXPECTED_RESPONSE_CODE) {
-					resolve({ error: `HTTP error, status: ${res.statusCode}` });
-					return;
-				}
-
-				res.on("data", (chunk) => {
-					data += chunk;
-				});
-
-				res.on("end", () => {
-					try {
-						const geolocationData = JSON.parse(data) as GeoResponse;
-						resolve(geolocationData);
-					} catch (err) {
-						resolve({ error: String(err) });
-					}
-				});
-			})
-			.on("error", (err) => {
-				resolve({ error: String(err) });
-			});
-	});
 }
