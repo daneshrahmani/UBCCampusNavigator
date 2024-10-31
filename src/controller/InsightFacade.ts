@@ -1,12 +1,10 @@
-import Section, { parseSectionsData } from "../utils/Section";
-import {
-	addToDisk,
-	getAddedDatasetIDs,
-	sectionSatisfies,
-	sortedResults,
-	validateId,
-	validateQueryStructure,
-} from "../utils/helpers";
+import Section, { parseSectionsData } from "../models/Section";
+import { transformResults } from "../utils/query/transformations";
+import { sectionSatisfies, selectColumns } from "../utils/query/queryProcessor";
+import { sortedResults } from "../utils/query/sorting";
+import { validateId } from "../utils/validation/idValidation";
+import { validateQueryStructure } from "../utils/validation/queryValidation";
+import { addToDisk, getAddedDatasetIDs } from "../services/disk/diskService";
 import {
 	IInsightFacade,
 	InsightDataset,
@@ -19,10 +17,12 @@ import {
 import JSZip from "jszip";
 import * as path from "path";
 import * as fs from "fs-extra";
-import { Dataset } from "../utils/Dataset";
-import Room, { parseRoomsData } from "../utils/Room";
+import { Dataset } from "../models/Dataset";
+import Room, { parseRoomsData } from "../models/Room";
 
 export const DATA_DIR = path.join(__dirname, "..", "..", "data");
+
+const maximumResultLength = 5000;
 
 /**
  * This is the main programmatic entry point for the project.
@@ -61,8 +61,6 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async removeDataset(id: string): Promise<string> {
-		// TODO: Remove this once you implement the methods!
-
 		validateId(id);
 
 		const addedIds = await getAddedDatasetIDs();
@@ -74,24 +72,24 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async performQuery(query: unknown): Promise<InsightResult[]> {
-		// TODO: Remove this once you implement the methods!
 		const datasetId = validateQueryStructure(query);
-		const maximumResultLength = 5000;
-		const queryObj = query as { WHERE: any; OPTIONS: { COLUMNS: string[]; ORDER?: string } };
+		const queryObj = query as {
+			WHERE: any;
+			OPTIONS: { COLUMNS: string[]; ORDER?: string };
+			TRANSFORMATIONS?: { GROUP: string[]; APPLY: any[] };
+		};
 		try {
 			const content = await fs.readJSON(path.join(DATA_DIR, datasetId));
-			const filteredSects = content.data.filter((section: any) => sectionSatisfies(queryObj.WHERE, section));
+			const filteredEntries = content.data.filter((section: any) => sectionSatisfies(queryObj.WHERE, section));
 
-			const columns = queryObj.OPTIONS.COLUMNS;
-			const results = filteredSects.map((section: any) => {
-				const result: InsightResult = {};
-				for (const column of columns) {
-					// Array destructuring from ChatGPT
-					const [, field] = column.split("_");
-					result[column] = section[field];
-				}
-				return result;
-			});
+			let results;
+
+			if (queryObj.TRANSFORMATIONS) {
+				results = transformResults(queryObj, filteredEntries);
+			} else {
+				const columns = queryObj.OPTIONS.COLUMNS;
+				results = filteredEntries.map((section: any) => selectColumns(section, columns));
+			}
 
 			if (results.length > maximumResultLength) {
 				throw new ResultTooLargeError("Query is returning more than 5000 items");
@@ -112,7 +110,6 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async listDatasets(): Promise<InsightDataset[]> {
-		// TODO: Remove this once you implement the methods!
 		await this.initialize();
 		const datasetFiles = await fs.readdir(DATA_DIR);
 
