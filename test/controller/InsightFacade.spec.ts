@@ -501,6 +501,10 @@ describe("InsightFacade", function () {
 			it("[valid/all-rooms.json] Get all rooms", checkQuery);
 		});
 
+		describe("Transformations Quries", function () {
+			it("[valid/transformation.json] Overall and min averages of courses by title", checkQuery);
+		});
+
 		// Examples demonstrating how to test performQuery using the JSON Test Queries.
 		// The relative path to the query file must be given in square brackets.
 		describe("PerformQuery Failure cases", function () {

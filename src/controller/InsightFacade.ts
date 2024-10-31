@@ -4,6 +4,7 @@ import {
 	getAddedDatasetIDs,
 	sectionSatisfies,
 	sortedResults,
+	transformResults,
 	validateId,
 	validateQueryStructure,
 } from "../utils/helpers";
@@ -77,10 +78,18 @@ export default class InsightFacade implements IInsightFacade {
 		// TODO: Remove this once you implement the methods!
 		const datasetId = validateQueryStructure(query);
 		const maximumResultLength = 5000;
-		const queryObj = query as { WHERE: any; OPTIONS: { COLUMNS: string[]; ORDER?: string } };
+		const queryObj = query as {
+			WHERE: any;
+			OPTIONS: { COLUMNS: string[]; ORDER?: string };
+			TRANSFORMATIONS?: { GROUP: string[]; APPLY: any[] };
+		};
 		try {
 			const content = await fs.readJSON(path.join(DATA_DIR, datasetId));
 			const filteredSects = content.data.filter((section: any) => sectionSatisfies(queryObj.WHERE, section));
+
+			if (queryObj.TRANSFORMATIONS) {
+				transformResults(filteredSects);
+			}
 
 			const columns = queryObj.OPTIONS.COLUMNS;
 			const results = filteredSects.map((section: any) => {

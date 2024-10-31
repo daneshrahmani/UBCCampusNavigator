@@ -50,11 +50,77 @@ export function validateQueryStructure(query: unknown): string {
 	) {
 		throw new InsightError("Invalid Query Structure");
 	} else {
-		const datasetId = validateOptions(query);
+		let datasetId = null;
+		const vtResults = validateTransformations(query, datasetId);
+		datasetId = vtResults[0];
+		const transformationsColumns = vtResults[1];
+		datasetId = validateOptions(query, datasetId, transformationsColumns);
+		if (datasetId === null) {
+			throw new InsightError("bad");
+		}
 		validateWhereClause(query.WHERE, datasetId);
 		// TODO create and call validateTransformations (optional to have a transformations clause)
 		return datasetId;
 	}
+}
+
+const validApplyTokens = ["MAX", "MIN", "AVG", "COUNT", "SUM"];
+
+function validateApplyClause(query: any, applyColumns: string[], datasetId: string | null): string | null {
+	for (const rule of query.TRANSFORMATIONS.APPLY) {
+		if (Object.keys(rule).length !== 1) {
+			throw new InsightError("Invalid APPLYRULE");
+		}
+		const key = Object.keys(rule)[0];
+		applyColumns.push(key);
+		if (Object.keys(rule[key]).length !== 1) {
+			throw new InsightError("Invalid APPLYRULE");
+		}
+		const applyToken = Object.keys(rule[key])[0];
+		if (!validApplyTokens.includes(applyToken)) {
+			throw new InsightError("Invalid APPLYTOKEN");
+		}
+		const dataKey = rule[key][applyToken];
+
+		const dataKeyParts = dataKey.split("_");
+		const expectedNumKeyParts = 2
+		if (dataKeyParts.length !== expectedNumKeyParts) {
+			throw new InsightError("Invalid data reference");
+		}
+		if (datasetId === null) {
+			datasetId = dataKeyParts[0];
+		} else if (datasetId !== dataKeyParts[0]) {
+			throw new InsightError("Query references multiple datasets");
+		}
+	}
+	return datasetId
+}
+
+function validateTransformations(query: any, datasetId: string | null): any {
+	const groupColumns: string[] = [];
+	const applyColumns: string[] = [];
+	if (query.TRANSFORMATIONS) {
+		
+		datasetId = validateApplyClause(query, applyColumns, datasetId);
+
+		if (query.TRANSFORMATIONS.GROUP.length === 0) {
+			throw new InsightError("GROUP must be a non-empty array");
+		}
+		for (const dataKey of query.TRANSFORMATIONS.GROUP) {
+			const dataKeyParts = dataKey.split("_");
+			const expectedNumKeyParts = 2
+			if (dataKeyParts.length !== expectedNumKeyParts) {
+				throw new InsightError("Invalid data reference");
+			}
+			if (datasetId === null) {
+				datasetId = dataKeyParts[0];
+			} else if (datasetId !== dataKeyParts[0]) {
+				throw new InsightError("Query references multiple datasets");
+			}
+			groupColumns.push(dataKey);
+		}
+	}
+	return [datasetId, [...groupColumns, ...applyColumns]];
 }
 
 export function sectionSatisfies(whereClause: any, section: any): boolean {
@@ -88,6 +154,10 @@ export function sectionSatisfies(whereClause: any, section: any): boolean {
 			throw new InsightError("Invalid key");
 		}
 	}
+}
+
+export function transformResults(results: any) {
+	console.log(results);
 }
 
 export function sortedResults(results: InsightResult[], query: any): InsightResult[] {
@@ -194,29 +264,37 @@ const validFields = [
 ];
 
 // Validate the options field of the query and return the dataset id
-function validateOptions(query: any): string {
-	let datasetId = null;
+function validateOptions(query: any, datasetId: any, transformationsColumns: any) {
 	const queryColumns = query.OPTIONS.COLUMNS;
-	const maxLength = 2;
-	for (const column of queryColumns) {
-		const parsedColumn = column.split("_");
-		if (parsedColumn.length !== maxLength) {
-			throw new InsightError("Invalid column selection");
-		}
 
-		if (datasetId === null) {
-			datasetId = parsedColumn[0];
-		} else if (datasetId !== parsedColumn[0]) {
-			throw new InsightError("Query references multiple datasets");
+	if (transformationsColumns.length !== 0) {
+		for (const column of queryColumns) {
+			if (!transformationsColumns.includes(column)) {
+				throw new InsightError("Keys in COLUMNS must be in GROUP or APPLY when TRANSFORMATIONS is present");
+			}
 		}
+	} else {
+		const maxLength = 2;
+		for (const column of queryColumns) {
+			const parsedColumn = column.split("_");
+			if (parsedColumn.length !== maxLength) {
+				throw new InsightError("Invalid column selection");
+			}
 
-		if (!validFields.includes(parsedColumn[1])) {
-			throw new InsightError("Invalid column selection");
+			if (datasetId === null) {
+				datasetId = parsedColumn[0];
+			} else if (datasetId !== parsedColumn[0]) {
+				throw new InsightError("Query references multiple datasets");
+			}
+
+			if (!validFields.includes(parsedColumn[1])) {
+				throw new InsightError("Invalid column selection");
+			}
 		}
-	}
-	if (query.OPTIONS.ORDER) {
-		if (typeof query.OPTIONS.ORDER === "string" && !queryColumns.includes(query.OPTIONS.ORDER)) {
-			throw new InsightError("Order key does not exist in the columns being queried");
+		if (query.OPTIONS.ORDER) {
+			if (typeof query.OPTIONS.ORDER === "string" && !queryColumns.includes(query.OPTIONS.ORDER)) {
+				throw new InsightError("Order key does not exist in the columns being queried");
+			}
 		}
 	}
 	return datasetId;
