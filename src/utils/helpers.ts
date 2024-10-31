@@ -278,21 +278,12 @@ function validateNonLogicFilters(key: any, val: any): void {
 			break;
 		case "EQ":
 		case "GT":
-		case "LT": {
-			// Checking that Key exists and is not a string type
-			if (!objectKey) {
-				throw new InsightError("Missing key for EQ, GT, or LT");
-			}
-			const field = objectKey.split("_");
-			if (field.length > 1 && stringFields.includes(field[1])) {
-				throw new InsightError("Invalid Key type for EQ, GT, or LT");
-			}
-
-			// Checking that Value is of type Number
-			if (typeof objectValue !== "number") {
-				throw new InsightError("Invalid Value type for EQ, GT or LT. Value type must be a number");
-			}
-
+		case "LT":
+		case "MAX":
+		case "MIN":
+		case "AVG":
+		case "SUM": {
+			validateNumericComparators(objectKey, stringFields, objectValue);
 			break;
 		}
 		case "IS": {
@@ -310,5 +301,22 @@ function validateNonLogicFilters(key: any, val: any): void {
 
 			break;
 		}
+	}
+}
+
+// Validating Keys and Values for EQ, GT, LT, MAX, MIN, AVG, SUM
+function validateNumericComparators(objectKey: any, stringFields: string[], objectValue: any): void {
+	// Checking that Key exists and is not a string type
+	if (!objectKey) {
+		throw new InsightError("Missing key for EQ, GT, LT, MAX, MIN, AVG, SUM");
+	}
+	const field = objectKey.split("_");
+	if (field.length > 1 && stringFields.includes(field[1])) {
+		throw new InsightError("Invalid Key type for EQ, GT, LT, MAX, MIN, AVG, SUM");
+	}
+
+	// Checking that Value is of type Number
+	if (typeof objectValue !== "number") {
+		throw new InsightError("Invalid Value type for EQ, GT, LT, MAX, MIN, AVG, SUM. Value type must be a number");
 	}
 }
