@@ -1,14 +1,10 @@
-import Section, { parseSectionsData } from "../utils/Section";
-import {
-	addToDisk,
-	getAddedDatasetIDs,
-	sectionSatisfies,
-	selectColumns,
-	sortedResults,
-	transformResults,
-	validateId,
-	validateQueryStructure,
-} from "../utils/helpers";
+import Section, { parseSectionsData } from "../models/Section";
+import { transformResults } from "../utils/query/transformations";
+import { sectionSatisfies, selectColumns } from "../utils/query/queryProcessor";
+import { sortedResults } from "../utils/query/sorting";
+import { validateId } from "../utils/validation/idValidation";
+import { validateQueryStructure } from "../utils/validation/queryValidation";
+import { addToDisk, getAddedDatasetIDs } from "../services/disk/diskService";
 import {
 	IInsightFacade,
 	InsightDataset,
@@ -21,8 +17,8 @@ import {
 import JSZip from "jszip";
 import * as path from "path";
 import * as fs from "fs-extra";
-import { Dataset } from "../utils/Dataset";
-import Room, { parseRoomsData } from "../utils/Room";
+import { Dataset } from "../models/Dataset";
+import Room, { parseRoomsData } from "../models/Room";
 
 export const DATA_DIR = path.join(__dirname, "..", "..", "data");
 
@@ -65,8 +61,6 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async removeDataset(id: string): Promise<string> {
-		// TODO: Remove this once you implement the methods!
-
 		validateId(id);
 
 		const addedIds = await getAddedDatasetIDs();
@@ -116,7 +110,6 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async listDatasets(): Promise<InsightDataset[]> {
-		// TODO: Remove this once you implement the methods!
 		await this.initialize();
 		const datasetFiles = await fs.readdir(DATA_DIR);
 
