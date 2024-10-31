@@ -502,7 +502,7 @@ describe("InsightFacade", function () {
 		});
 
 		describe("Transformations Quries", function () {
-			it("[valid/transformation.json] Overall and min averages of courses by title", checkQuery);
+			it("[valid/transformation.json] Transformations and aggreate functions", checkQuery);
 		});
 
 		// Examples demonstrating how to test performQuery using the JSON Test Queries.

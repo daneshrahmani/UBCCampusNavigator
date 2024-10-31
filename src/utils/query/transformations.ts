@@ -59,37 +59,61 @@ function hashEntry(entry: any, groupingFields: string[]): string {
 	return entryHash;
 }
 
-function applyAggregation(group: any[], fn: string, field: string, result: any, column: string): void {
-	if (fn === "MIN") {
-		let min = Infinity;
-		for (const entry of group) {
-			if (entry[field] < min) {
-				min = entry[field];
-			}
+function getMin(group: any, field: any): number {
+	let min = Infinity;
+	for (const entry of group) {
+		if (entry[field] < min) {
+			min = entry[field];
 		}
-		result[column] = min;
-	} else if (fn === "MAX") {
-		let max = -Infinity;
+	}
+	return min
+}
+
+function getMax(group: any, field: any): number {
+	let max = -Infinity;
 		for (const entry of group) {
 			if (entry[field] > max) {
 				max = entry[field];
 			}
 		}
-		result[column] = max;
-	} else if (fn === "SUM") {
-		let sum = 0;
+	return max
+}
+
+function getSum(group: any, field: any): number {
+	let sum = 0;
 		for (const entry of group) {
 			sum += entry[field];
 		}
-		result[column] = Number(sum.toFixed(ROUND_TO));
-	} else if (fn === "AVG") {
-		let total = new Decimal(0);
+	return Number(sum.toFixed(ROUND_TO))
+}
+
+function getAvg(group: any, field: any): number {
+	let total = new Decimal(0);
 		for (const entry of group) {
 			total = total.add(new Decimal(entry[field]));
 		}
 		const avg = total.toNumber() / group.length;
-		result[column] = Number(avg.toFixed(ROUND_TO));
+	return Number(avg.toFixed(ROUND_TO));
+}
+
+function getCount(group: any, field: any):number {
+	const uniqueItems = new Set()
+		for (const entry of group) {
+			uniqueItems.add(entry[field])
+		}
+	return uniqueItems.size
+}
+
+function applyAggregation(group: any[], fn: string, field: string, result: any, column: string): void {
+	if (fn === "MIN") {
+		result[column] = getMin(group, field);
+	} else if (fn === "MAX") {
+		result[column] = getMax(group, field);
+	} else if (fn === "SUM") {
+		result[column] = getSum(group, field);
+	} else if (fn === "AVG") {
+		result[column] = getAvg(group, field);
 	} else if (fn === "COUNT") {
-		result[column] = group.length;
+		result[column] = getCount(group, field);
 	}
 }
