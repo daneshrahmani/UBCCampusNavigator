@@ -189,7 +189,7 @@ async function getRoomsFromBuilding(building: string): Promise<RoomDataObject[]>
 export async function parseRoomsData(data: JSZip): Promise<Room[]> {
 	const rooms: Room[] = [];
 
-	const index = await data.file("campus/index.htm")?.async("text");
+	const index = await data.file("index.htm")?.async("text");
 
 	if (!index) {
 		throw new InsightError("Invalid rooms dataset");
@@ -289,7 +289,7 @@ async function processBuilding(building: Building, data: JSZip, rooms: Room[]): 
 	const { link, address } = building;
 
 	try {
-		const buildingFile = await data.file(link.replace(".", "campus"))?.async("text");
+		const buildingFile = await data.file(link.substring(2))?.async("text");
 		if (!buildingFile) {
 			return;
 		}

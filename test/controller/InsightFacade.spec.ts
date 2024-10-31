@@ -43,7 +43,7 @@ describe("InsightFacade", function () {
 		noResultKeyDataset = await getContentFromArchives("noResultKey.zip");
 		noSectionsDataset = await getContentFromArchives("noSections.zip");
 		audit1to5001Dataset = await getContentFromArchives("audit-1-to-5001.zip");
-		rooms = await getContentFromArchives("campus.zip");
+		rooms = await getContentFromArchives("rooms.zip");
 		// Just in case there is anything hanging around from a previous run of the test suite
 		await clearDisk();
 	});
@@ -498,6 +498,7 @@ describe("InsightFacade", function () {
 		describe("Rooms Queries", function () {
 			it("[valid/simple-rooms.json] Rooms seating more than 300", checkQuery);
 			it("[valid/rooms-sort.json] Sort with order and multiple keys", checkQuery);
+			it("[valid/all-rooms.json] Get all rooms", checkQuery);
 		});
 
 		// Examples demonstrating how to test performQuery using the JSON Test Queries.
