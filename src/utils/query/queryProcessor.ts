@@ -1,6 +1,12 @@
 import {InsightError, InsightResult} from "../../controller/IInsightFacade";
 import { parseMComparison, parseSComparison } from "./parsing";
 
+function checkField(entry: any, field: any): void {
+	if (!(field in entry)) {
+		throw new InsightError("Field not in dataset")
+	}
+}
+
 export function sectionSatisfies(whereClause: any, section: any): boolean {
 	const whereClauseEntries = Object.entries(whereClause);
 	if (whereClauseEntries.length === 0) {
@@ -16,21 +22,24 @@ export function sectionSatisfies(whereClause: any, section: any): boolean {
 			return val.some((subClause: any) => sectionSatisfies(subClause, section));
 		} else if (key === "LT") {
 			const [mfield, number] = parseMComparison(val);
+			checkField(section, mfield)
 			return section[mfield] < number;
 		} else if (key === "GT") {
 			const [mfield, number] = parseMComparison(val);
+			checkField(section, mfield)
 			return section[mfield] > number;
 		} else if (key === "EQ") {
 			const [mfield, number] = parseMComparison(val);
+			checkField(section, mfield)
 			return section[mfield] === number;
 		} else if (key === "IS") {
 			const [sfield, pattern] = parseSComparison(val);
+			checkField(section, sfield)
 			return pattern.test(section[sfield]);
 		} else if (key === "NOT") {
 			return !sectionSatisfies(val, section);
-		} else {
-			throw new InsightError("Invalid key");
 		}
+		throw new InsightError("Invalid key");
 	}
 }
 
@@ -39,6 +48,9 @@ export function selectColumns(section: any, columns: any): any {
 	for (const column of columns) {
 		// Array destructuring from ChatGPT
 		const [, field] = column.split("_");
+		if (!(field in section)) {
+			throw new InsightError("Field not in dataset")
+		}
 		result[column] = section[field];
 	}
 	return result;

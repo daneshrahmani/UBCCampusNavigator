@@ -1,4 +1,5 @@
 import Decimal from "decimal.js";
+import { InsightError } from "../../controller/IInsightFacade";
 
 const ROUND_TO = 2;
 
@@ -54,6 +55,9 @@ function groupData(filteredSects: any[], groupingFields: string[]): Map<string, 
 function hashEntry(entry: any, groupingFields: string[]): string {
 	let entryHash = "";
 	for (const field of groupingFields) {
+		if (!(field in entry)) {
+			throw new InsightError("Field does not exist in dataset")
+		}
 		entryHash += `~${entry[field]}`;
 	}
 	return entryHash;
@@ -105,6 +109,9 @@ function getCount(group: any, field: any):number {
 }
 
 function applyAggregation(group: any[], fn: string, field: string, result: any, column: string): void {
+	if (!(field in group[0])) {
+		throw new InsightError("Field does not exist in dataset")
+	}
 	if (fn === "MIN") {
 		result[column] = getMin(group, field);
 	} else if (fn === "MAX") {
