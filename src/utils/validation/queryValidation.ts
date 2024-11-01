@@ -141,7 +141,7 @@ function validateTransformations(query: any, datasetId: string | null): any {
 	if (query.TRANSFORMATIONS) {
 		datasetId = validateApplyClause(query, applyColumns, datasetId);
 
-		if (query.TRANSFORMATIONS.GROUP.length === 0) {
+		if (query.TRANSFORMATIONS.GROUP.length === 0 || !Array.isArray(query.TRANSFORMATIONS.GROUP)) {
 			throw new InsightError("GROUP must be a non-empty array");
 		}
 		for (const dataKey of query.TRANSFORMATIONS.GROUP) {
@@ -167,11 +167,19 @@ function validateApplyClause(query: any, applyColumns: string[], datasetId: stri
 			throw new InsightError("Invalid APPLYRULE");
 		}
 		const key = Object.keys(rule)[0];
+		if (key.includes("_")) {
+			throw new InsightError("Invalid APPLYRULE - apply key cannot contain underscore");
+		}
 		applyColumns.push(key);
+		if (typeof rule[key] !== "object" || rule[key] === null || Array.isArray(rule[key])) {
+			throw new InsightError("Invalid APPLYRULE");
+		}
+
 		if (Object.keys(rule[key]).length !== 1) {
 			throw new InsightError("Invalid APPLYRULE");
 		}
 		const applyToken = Object.keys(rule[key])[0];
+
 		validateNonLogicFilters(applyToken, rule[key][applyToken]);
 		if (!validApplyTokens.includes(applyToken)) {
 			throw new InsightError("Invalid APPLYTOKEN");
