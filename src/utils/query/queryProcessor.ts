@@ -39,6 +39,9 @@ export function selectColumns(section: any, columns: any): any {
 	for (const column of columns) {
 		// Array destructuring from ChatGPT
 		const [, field] = column.split("_");
+		if (!(field in section)) {
+			throw new InsightError("Field not in dataset")
+		}
 		result[column] = section[field];
 	}
 	return result;
