@@ -505,6 +505,17 @@ describe("InsightFacade", function () {
 			it("[valid/transformation.json] Transformations and aggreate functions", checkQuery);
 		});
 
+		describe("Invalid Room-Related Queries", function () {
+			it(
+				"[invalid/room-data-in-section-query-apply.json] Can't reference lat in apply clause of sections dataset",
+				checkQuery
+			);
+			it(
+				"[invalid/room-data-in-section-columns.json] Can't reference lat in column clause of sections dataset",
+				checkQuery
+			);
+		});
+
 		// Examples demonstrating how to test performQuery using the JSON Test Queries.
 		// The relative path to the query file must be given in square brackets.
 		describe("PerformQuery Failure cases", function () {

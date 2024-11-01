@@ -1,0 +1,51 @@
+{
+	"title": "Transformations and aggregate functions",
+	"input": {
+		"WHERE": {},
+		"OPTIONS": {
+			"COLUMNS": [
+				"sections_title",
+				"overallAvg",
+				"minAvg",
+				"count",
+				"maxAvg",
+				"sumAudit"
+			],
+			"ORDER": "sumAudit"
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": [
+				"sections_title"
+			],
+			"APPLY": [
+				{
+					"overallAvg": {
+						"AVG": "sections_avg"
+					}
+				},
+				{
+					"minAvg": {
+						"MIN": "sections_lat"
+					}
+				},
+				{
+					"count": {
+						"COUNT": "sections_avg"
+					}
+				},
+				{
+					"maxAvg": {
+						"MAX": "sections_avg"
+					}
+				},
+				{
+					"sumAudit": {
+						"SUM": "sections_audit"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

@@ -1,4 +1,5 @@
 import Decimal from "decimal.js";
+import { InsightError } from "../../controller/IInsightFacade";
 
 const ROUND_TO = 2;
 
@@ -105,6 +106,9 @@ function getCount(group: any, field: any):number {
 }
 
 function applyAggregation(group: any[], fn: string, field: string, result: any, column: string): void {
+	if (!(field in group[0])) {
+		throw new InsightError("Field does not exist in dataset")
+	}
 	if (fn === "MIN") {
 		result[column] = getMin(group, field);
 	} else if (fn === "MAX") {
