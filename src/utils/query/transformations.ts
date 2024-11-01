@@ -55,6 +55,9 @@ function groupData(filteredSects: any[], groupingFields: string[]): Map<string, 
 function hashEntry(entry: any, groupingFields: string[]): string {
 	let entryHash = "";
 	for (const field of groupingFields) {
+		if (!(field in entry)) {
+			throw new InsightError("Field does not exist in dataset")
+		}
 		entryHash += `~${entry[field]}`;
 	}
 	return entryHash;

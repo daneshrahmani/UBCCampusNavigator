@@ -507,11 +507,19 @@ describe("InsightFacade", function () {
 
 		describe("Invalid Room-Related Queries", function () {
 			it(
-				"[invalid/room-data-in-section-query-apply.json] Can't reference lat in apply clause of sections dataset",
+				"[invalid/room-data-in-section-query-apply.json] Can't reference room field in APPLY clause of sections dataset",
 				checkQuery
 			);
 			it(
-				"[invalid/room-data-in-section-columns.json] Can't reference lat in column clause of sections dataset",
+				"[invalid/room-data-in-section-columns.json] Can't reference room field in COLUMN clause of sections dataset",
+				checkQuery
+			);
+			it(
+				"[invalid/room-data-in-section-query-group.json] Can't reference room field in GROUP clause of sections dataset",
+				checkQuery
+			);
+			it(
+				"[invalid/room-data-in-section-query-where.json] Can't reference room field in WHERE clause of sections dataset",
 				checkQuery
 			);
 		});
