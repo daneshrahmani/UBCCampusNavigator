@@ -3,16 +3,20 @@ import { StatusCodes } from "http-status-codes";
 import Log from "@ubccpsc310/folder-test/build/Log";
 import * as http from "http";
 import cors from "cors";
+import InsightFacade from "../controller/InsightFacade";
+import { InsightDatasetKind, InsightError } from "../controller/IInsightFacade";
 
 export default class Server {
 	private readonly port: number;
 	private express: Application;
 	private server: http.Server | undefined;
+	private insightFacade: InsightFacade;
 
 	constructor(port: number) {
 		Log.info(`Server::<init>( ${port} )`);
 		this.port = port;
 		this.express = express();
+		this.insightFacade = new InsightFacade();
 
 		this.registerMiddleware();
 		this.registerRoutes();
@@ -89,6 +93,8 @@ export default class Server {
 		this.express.get("/echo/:msg", Server.echo);
 
 		// TODO: your other endpoints should go here
+		this.express.get("/datasets", (req, res) => this.listDatasets(req, res))
+		this.express.put("/dataset/:id/:kind", (req, res) => this.addDataset(req, res))
 	}
 
 	// The next two methods handle the echo service.
@@ -109,6 +115,21 @@ export default class Server {
 			return `${msg}...${msg}`;
 		} else {
 			return "Message not provided";
+		}
+	}
+
+	private async listDatasets(req: Request, res: Response) {
+		const datasets = await this.insightFacade.listDatasets();
+		res.status(200).json({result: datasets});
+	}
+
+	private async addDataset(req: Request, res: Response) {
+		const base64String = req.body.toString('base64');
+		try {
+			const datasets = await this.insightFacade.addDataset(req.params.id, base64String, req.params.kind as InsightDatasetKind)
+			res.status(StatusCodes.OK).json({ result: datasets })
+		} catch(err) {
+			res.status(StatusCodes.BAD_REQUEST).json({ error: (err as InsightError).message })
 		}
 	}
 }
