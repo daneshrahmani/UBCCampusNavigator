@@ -4,7 +4,7 @@ import Log from "@ubccpsc310/folder-test/build/Log";
 import * as http from "http";
 import cors from "cors";
 import InsightFacade from "../controller/InsightFacade";
-import { InsightDatasetKind, InsightError } from "../controller/IInsightFacade";
+import { InsightDatasetKind, InsightError, NotFoundError } from "../controller/IInsightFacade";
 
 export default class Server {
 	private readonly port: number;
@@ -93,8 +93,9 @@ export default class Server {
 		this.express.get("/echo/:msg", Server.echo);
 
 		// TODO: your other endpoints should go here
-		this.express.get("/datasets", (req, res) => this.listDatasets(req, res))
-		this.express.put("/dataset/:id/:kind", (req, res) => this.addDataset(req, res))
+		this.express.get("/datasets", async (_req, res) => this.listDatasets(_req, res));
+		this.express.put("/dataset/:id/:kind", async (req, res) => this.addDataset(req, res));
+		this.express.delete("/dataset/:id", async (req, res) => this.removeDataset(req, res));
 	}
 
 	// The next two methods handle the echo service.
@@ -118,18 +119,35 @@ export default class Server {
 		}
 	}
 
-	private async listDatasets(req: Request, res: Response) {
+	private async listDatasets(_req: Request, res: Response): Promise<void> {
 		const datasets = await this.insightFacade.listDatasets();
-		res.status(200).json({result: datasets});
+		res.status(StatusCodes.OK).json({ result: datasets });
 	}
 
-	private async addDataset(req: Request, res: Response) {
-		const base64String = req.body.toString('base64');
+	private async addDataset(req: Request, res: Response): Promise<void> {
+		const base64String = req.body.toString("base64");
 		try {
-			const datasets = await this.insightFacade.addDataset(req.params.id, base64String, req.params.kind as InsightDatasetKind)
-			res.status(StatusCodes.OK).json({ result: datasets })
-		} catch(err) {
-			res.status(StatusCodes.BAD_REQUEST).json({ error: (err as InsightError).message })
+			const datasets = await this.insightFacade.addDataset(
+				req.params.id,
+				base64String,
+				req.params.kind as InsightDatasetKind
+			);
+			res.status(StatusCodes.OK).json({ result: datasets });
+		} catch (err) {
+			res.status(StatusCodes.BAD_REQUEST).json({ error: (err as InsightError).message });
+		}
+	}
+
+	private async removeDataset(req: Request, res: Response): Promise<void> {
+		try {
+			const dataset = await this.insightFacade.removeDataset(req.params.id);
+			res.status(StatusCodes.OK).json({ result: dataset });
+		} catch (err) {
+			if (err instanceof InsightError) {
+				res.status(StatusCodes.BAD_REQUEST).json({ error: err.message });
+			} else if (err instanceof NotFoundError) {
+				res.status(StatusCodes.NOT_FOUND).json({ error: err.message });
+			}
 		}
 	}
 }
