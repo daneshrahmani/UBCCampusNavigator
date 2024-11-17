@@ -4,7 +4,7 @@ import Log from "@ubccpsc310/folder-test/build/Log";
 import * as http from "http";
 import cors from "cors";
 import InsightFacade from "../controller/InsightFacade";
-import { InsightDatasetKind, InsightError, NotFoundError } from "../controller/IInsightFacade";
+import { InsightDatasetKind, InsightError, NotFoundError, ResultTooLargeError } from "../controller/IInsightFacade";
 
 export default class Server {
 	private readonly port: number;
@@ -96,6 +96,7 @@ export default class Server {
 		this.express.get("/datasets", async (_req, res) => this.listDatasets(_req, res));
 		this.express.put("/dataset/:id/:kind", async (req, res) => this.addDataset(req, res));
 		this.express.delete("/dataset/:id", async (req, res) => this.removeDataset(req, res));
+		this.express.post("/query", async (req, res) => this.performQuery(req, res));
 	}
 
 	// The next two methods handle the echo service.
@@ -148,6 +149,15 @@ export default class Server {
 			} else if (err instanceof NotFoundError) {
 				res.status(StatusCodes.NOT_FOUND).json({ error: err.message });
 			}
+		}
+	}
+
+	private async performQuery(req: Request, res: Response): Promise<void> {
+		try {
+			const results = await this.insightFacade.performQuery(req.body);
+			res.status(StatusCodes.OK).json({ result: results });
+		} catch (err) {
+			res.status(StatusCodes.BAD_REQUEST).json({ error: (err as InsightError | ResultTooLargeError).message });
 		}
 	}
 }
