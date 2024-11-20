@@ -1,6 +1,5 @@
 import React from 'react';
-import ClearSelectedRoomsButton from "./Buttons/ClearSelectedRoomsButton";
-import SelectedRoom from "./Cards/SelectedRoom";
+import ClearSelectedRoomsButton from "../Buttons/ClearSelectedRoomsButton";
 
 function RightPanel({ states }) {
 	const { selectedRooms } = states;
@@ -12,21 +11,6 @@ function RightPanel({ states }) {
 			<div className="mb-4">
 				<h6>Summary</h6>
 				<p>Selected Rooms: {selectedRooms.length}</p>
-			</div>
-
-			<div>
-				{selectedRooms.length > 0 ? (
-					<div className="room-details">
-						{selectedRooms.map((room) => (
-							<SelectedRoom
-								key={room.rooms_name}
-								room={room}
-							/>
-						))}
-					</div>
-				) : (
-					<p className="text-muted">Select rooms to see analysis</p>
-				)}
 			</div>
 
 			<div className="mt-auto">

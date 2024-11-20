@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Sidebar from './components/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { getRooms } from './store/queries';
-import RoomComparator from './components/RoomCompartor';
-import RightPanel from './components/RightPanel';
+import BottomPanel from "./components/Panels/BottomPanel";
+import RightPanel from './components/Panels/RightPanel';
 import UBCMap from './components/UBCMap';
 
 function App() {
@@ -36,13 +35,15 @@ function App() {
 				<div className="col-2 border-end">
 					<Sidebar states={states} />
 				</div>
-				<div className="col-8 position-relative">
-					<div className="px-4 pt-4">
+
+				<div className="col-8 position-relative h-100">
+					<div className="h-100">
 						<UBCMap />
 					</div>
-					<RoomComparator states={states} />
+					<BottomPanel states={states} />
 				</div>
-				<div className="col-2" >
+
+				<div className="col-2">
 					<RightPanel states={states} />
 				</div>
 			</div>
