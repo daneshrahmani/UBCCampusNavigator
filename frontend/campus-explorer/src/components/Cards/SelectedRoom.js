@@ -26,7 +26,7 @@ function SelectedRoom({room, style}) {
 					<strong>Address:</strong> {room.rooms_address}
 				</p>
 				<p className="card-text small mb-0">
-					<strong>Capacity:</strong> {room.rooms_seats}
+					<strong>Seat Capacity:</strong> {room.rooms_seats}
 				</p>
 			</div>
 		</div>
