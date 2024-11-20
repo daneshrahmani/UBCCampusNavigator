@@ -5,6 +5,7 @@ import Sidebar from './components/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { getRooms } from './store/queries';
 import RoomComparator from './components/RoomCompartor';
+import RightPanel from './components/RightPanel';
 import UBCMap from './components/UBCMap';
 
 function App() {
@@ -35,11 +36,14 @@ function App() {
 				<div className="col-2 border-end">
 					<Sidebar states={states} />
 				</div>
-				<div className="col-10 position-relative">
+				<div className="col-8 position-relative">
 					<div className="px-4 pt-4">
-						<UBCMap />  {/* Add the map here */}
+						<UBCMap />
 					</div>
 					<RoomComparator states={states} />
+				</div>
+				<div className="col-2" >
+					<RightPanel states={states} />
 				</div>
 			</div>
 		</div>
