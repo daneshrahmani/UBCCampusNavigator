@@ -14,19 +14,19 @@ function SelectedRoom({room, style}) {
 					</a>
 				</h6>
 				<p className="card-text small mb-0">
-					Full Name: {room.rooms_fullname}
+					<strong>Full Name:</strong> {room.rooms_fullname}
 				</p>
 				<p className="card-text small mb-0">
-					Short Name: {room.rooms_shortname}
+					<strong>Short Name:</strong> {room.rooms_shortname}
 				</p>
 				<p className="card-text small mb-0">
-					Number: {room.rooms_number}
+					<strong>Number:</strong> {room.rooms_number}
 				</p>
 				<p className="card-text small mb-0">
-					Address: {room.rooms_address}
+					<strong>Address:</strong> {room.rooms_address}
 				</p>
 				<p className="card-text small mb-0">
-					Capacity: {room.rooms_seats}
+					<strong>Capacity:</strong> {room.rooms_seats}
 				</p>
 			</div>
 		</div>
