@@ -1,0 +1,29 @@
+import { GoogleMap, LoadScript } from '@react-google-maps/api';
+import React from 'react';
+
+// NOTE: If we want to use the ubc wayfinding and maps api with leaflet and react-leflet only minimal changes are needed
+const UBCMap = () => {
+	// ubc coordinates for centring
+	const center = {
+		lat: 49.2606,
+		lng: -123.2460
+	};
+
+	const mapStyles = {
+		height: "800px",
+		width: "100%"
+	};
+
+	return (
+		<LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
+			<GoogleMap
+				mapContainerStyle={mapStyles}
+				zoom={16}
+				center={center}
+			>
+			</GoogleMap>
+		</LoadScript>
+	);
+};
+
+export default UBCMap;
