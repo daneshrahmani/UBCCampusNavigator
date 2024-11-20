@@ -28,18 +28,18 @@ function App() {
     fetchRooms();
   }, [])
 
-  return (
-    <div className="App">
-      <div className="row">
-        <div className="col-2" style={{}}>
-          <Sidebar states={states} />
-        </div>
-        <div className="col-10">
-          <RoomComparator states={states} />
-        </div>
-      </div>
-    </div>
-  );
+	return (
+		<div className="App vh-100">
+			<div className="row h-100 g-0">
+				<div className="col-2 border-end">
+					<Sidebar states={states} />
+				</div>
+				<div className="col-10 position-relative">
+					<RoomComparator states={states} />
+				</div>
+			</div>
+		</div>
+	);
 }
 
 export default App;

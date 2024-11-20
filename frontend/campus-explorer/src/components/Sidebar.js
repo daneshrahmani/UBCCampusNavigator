@@ -1,4 +1,5 @@
 import Accordion from 'react-bootstrap/Accordion';
+import "../styling/sidebar.css"
 
 const toggleRoomSelection = (room, selectedRooms, setSelectedRooms) => {
     if (selectedRooms.map(room => room.rooms_name).includes(room.rooms_name)) {
@@ -26,11 +27,20 @@ function Sidebar({ states }) {
 
     }
 
-    return (
-        <Accordion defaultActiveKey="0">
-            {buildingRooms.map((building, idx) => SidebarBuilding({name: building[0].rooms_shortname, idx: idx.toString(), rooms: building, states: states}))}
-        </Accordion>
-    );
+	return (
+		<div className="sidebar-container">
+			<Accordion defaultActiveKey="0">
+				{buildingRooms.map((building, idx) =>
+					SidebarBuilding({
+						name: building[0].rooms_shortname,
+						idx: idx.toString(),
+						rooms: building,
+						states: states
+					})
+				)}
+			</Accordion>
+		</div>
+	);
 }
 
 function SidebarBuilding({ name, idx, rooms, states }) {
