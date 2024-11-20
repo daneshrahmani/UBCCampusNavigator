@@ -1,5 +1,5 @@
 import Accordion from 'react-bootstrap/Accordion';
-import "../styling/sidebar.css"
+import "../../styling/sidebar.css"
 
 const toggleRoomSelection = (room, selectedRooms, setSelectedRooms) => {
     if (selectedRooms.map(room => room.rooms_name).includes(room.rooms_name)) {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import Sidebar from './components/Sidebar';
+import Sidebar from './components/Panels/Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { getRooms } from './store/queries';
 import BottomPanel from "./components/Panels/BottomPanel";
