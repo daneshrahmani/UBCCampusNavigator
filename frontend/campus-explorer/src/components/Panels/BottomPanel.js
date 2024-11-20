@@ -5,14 +5,16 @@ function BottomPanel({ states }) {
 	const { selectedRooms } = states;
 
 	return (
-		<div className="position-absolute bottom-0 start-0 w-100 bg-white border-top p-3">
+		<div className="position-absolute bottom-0 start-0 w-100 bg-white border-top p-2">
 			<div className="container-fluid">
-				<div className="d-flex gap-2 overflow-auto">
+				<div className="d-flex gap-2 justify-content-start">
 					{selectedRooms.map((room) => (
 						<SelectedRoom
 							key={room.rooms_name}
 							room={room}
-							style={{minWidth: '150px'}}
+							style={{
+								width: '19.5%',
+							}}
 						/>
 					))}
 				</div>

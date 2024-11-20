@@ -1,8 +1,8 @@
 import React from "react";
 
-function SelectedRoom({room}) {
+function SelectedRoom({room, style}) {
 	return (
-		<div className="card mb-2 w-100">
+		<div className="card mb-2" style={style}>
 			<div className="card-body p-1">
 				<h6 className="card-title small mb-1">
 					<a
