@@ -1,5 +1,6 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
+import CapacitySlider from "./CapacitySlider";
 
 export default function FilteringTools({ states }) {
 
@@ -27,6 +28,7 @@ export default function FilteringTools({ states }) {
                 <option>Any</option>
                 {roomTypes.map(type => <option value={type}>{type}</option>)}
             </Form.Select>
+            <CapacitySlider states={states} />
         </div>
     )
 }

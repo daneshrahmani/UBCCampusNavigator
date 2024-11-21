@@ -6,20 +6,22 @@ import { getRooms } from './store/queries';
 import BottomPanel from "./components/Panels/BottomPanel";
 import RightPanel from './components/Panels/RightPanel';
 import UBCMap from './components/UBCMap';
-import { getFilteredRooms, groupRoomsByBuilding } from './store/helpers';
+import { getFilteredRooms, getMaxRoomCapacity, groupRoomsByBuilding } from './store/helpers';
 
 function App() {
 
 	const [roomData, setRoomData] = useState([]);
-	const [selectedRooms, setSelectedRooms] = useState([]);
-	const [filters, setFilters] = useState({
-		roomType: "Any"
-	})
 
-	console.log(selectedRooms)
+	const [filters, setFilters] = useState({
+		roomType: "Any",
+		capacityRange: [0, 0]
+	})
 
 	const filteredRooms = getFilteredRooms(roomData, filters); 
 	const roomsByBuilding = groupRoomsByBuilding(filteredRooms);
+
+	const [selectedRooms, setSelectedRooms] = useState([]);	
+	const [maxRoomCapacity, setMaxRoomCapacity] = useState(0);
 
 	const states = {
 		"filters": filters,
@@ -29,13 +31,20 @@ function App() {
 		"setRoomData": setRoomData,
 		"selectedRooms": selectedRooms,
 		"setSelectedRooms": setSelectedRooms,
-		"roomsByBuilding": roomsByBuilding
+		"roomsByBuilding": roomsByBuilding,
+		"maxRoomCapacity": maxRoomCapacity
 	}
 
 	useEffect(() => {
 		const fetchRooms = async () => {
 			const res = await getRooms();
 			setRoomData(res.result);
+			const maxCapacity = getMaxRoomCapacity(res.result)
+			setMaxRoomCapacity(maxCapacity)
+			setFilters({
+				roomType: "Any",
+				capacityRange: [0, maxCapacity]
+			})
 		}
 		fetchRooms();
 	}, [])
