@@ -20,14 +20,18 @@ export default function FilteringTools({ states }) {
     const roomTypes = [...roomTypesSet].sort();
 
     return (
-        <div>
-            <Form.Select
-                value={states.filters.roomType}
-                onChange={e => handleRoomTypeChange(e)}
-            >
-                <option>Any</option>
-                {roomTypes.map(type => <option value={type}>{type}</option>)}
-            </Form.Select>
+        <div className="card p-3">
+            <h5>Filters</h5>
+            <label className="d-flex flex-row align-items-center mb-3 text-nowrap">
+                Room Type:
+                <Form.Select
+                    value={states.filters.roomType}
+                    onChange={e => handleRoomTypeChange(e)}
+                >
+                    <option>Any</option>
+                    {roomTypes.map(type => <option value={type}>{type}</option>)}
+                </Form.Select>
+            </label>
             <CapacitySlider states={states} />
         </div>
     )

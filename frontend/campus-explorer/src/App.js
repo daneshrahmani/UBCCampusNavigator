@@ -57,14 +57,14 @@ function App() {
 					<Sidebar states={states} />
 				</div>
 
-				<div className="col-8 position-relative h-100">
+				<div className="col-7 position-relative h-100">
 					<div className="h-100">
 						<UBCMap states={states} />
 					</div>
 					<BottomPanel states={states} />
 				</div>
 
-				<div className="col-2">
+				<div className="col-3">
 					<RightPanel states={states} />
 				</div>
 			</div>
