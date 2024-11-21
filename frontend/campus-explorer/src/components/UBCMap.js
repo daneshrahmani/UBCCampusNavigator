@@ -1,5 +1,5 @@
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
-import React from 'react';
+import React, { useState } from 'react';
 
 const mapOptions = {
 	styles: [
@@ -26,10 +26,10 @@ const UBCMap = ({ states }) => {
 	}
 
 	// ubc coordinates for centring
-	const center = {
+	const [center, setCenter] = useState({
 		lat: 49.26596405700797,
 		lng: -123.25266284768082
-	};
+	})
 
 	const mapStyles = {
 		height: "89%",
@@ -41,11 +41,17 @@ const UBCMap = ({ states }) => {
 			<LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
 				<GoogleMap
 					mapContainerStyle={mapStyles}
-					zoom={16}
+					zoom={15.8}
 					center={center}
 					options={mapOptions}
 				>
-					{buildingInfo.map(b => <Marker position={{ lat: b.lat, lng: b.lon }} label={b.shortname} icon={null} />)}
+					{buildingInfo.map(b => (
+						<Marker
+							position={{ lat: b.lat, lng: b.lon }}
+							label={b.shortname}
+							icon={null}
+							onClick={() => setCenter({lat: b.lat, lng: b.lon})}
+						/>))}
 				</GoogleMap>
 			</LoadScript>
 		</div>
