@@ -6,21 +6,30 @@ import { getRooms } from './store/queries';
 import BottomPanel from "./components/Panels/BottomPanel";
 import RightPanel from './components/Panels/RightPanel';
 import UBCMap from './components/UBCMap';
-import { groupRoomsByBuilding } from './store/helpers';
+import { getFilteredRooms, groupRoomsByBuilding } from './store/helpers';
 
 function App() {
 
 	const [roomData, setRoomData] = useState([]);
 	const [selectedRooms, setSelectedRooms] = useState([]);
+	const [filters, setFilters] = useState({
+		roomType: "Any"
+	})
 
 	console.log(selectedRooms)
 
+	const filteredRooms = getFilteredRooms(roomData, filters); 
+	const roomsByBuilding = groupRoomsByBuilding(filteredRooms);
+
 	const states = {
+		"filters": filters,
+		"setFilters": setFilters,
+		"filteredRooms": filteredRooms,
 		"roomData": roomData,
 		"setRoomData": setRoomData,
 		"selectedRooms": selectedRooms,
 		"setSelectedRooms": setSelectedRooms,
-		"roomsByBuilding": groupRoomsByBuilding(roomData)
+		"roomsByBuilding": roomsByBuilding
 	}
 
 	useEffect(() => {

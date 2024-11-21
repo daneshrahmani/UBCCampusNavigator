@@ -1,6 +1,7 @@
 import React from 'react';
 import ClearSelectedRoomsButton from "../Buttons/ClearSelectedRoomsButton";
 import DistanceTable from '../DistanceTable';
+import FilteringTools from '../FilteringTools';
 
 function RightPanel({ states }) {
 	const { selectedRooms } = states;
@@ -20,6 +21,10 @@ function RightPanel({ states }) {
 					<DistanceTable states={states} />
 				</div>
 			}
+
+			<div>
+				<FilteringTools states={states} />
+			</div>
 
 			<div className="mt-auto">
 				<ClearSelectedRoomsButton states={states}/>

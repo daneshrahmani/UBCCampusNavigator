@@ -13,3 +13,11 @@ export const groupRoomsByBuilding = (roomData) => {
     }
     return buildingRooms
 }
+
+export const getFilteredRooms = (roomData, filters) => {
+    let filteredRooms = roomData;
+    if (filters.roomType !== "Any") {
+        filteredRooms = filteredRooms.filter(room => room.rooms_type === filters.roomType);
+    }
+    return filteredRooms;
+}

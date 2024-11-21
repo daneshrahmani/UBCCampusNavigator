@@ -25,9 +25,6 @@ const UBCMap = ({ states }) => {
 		})
 	}
 
-	console.log(buildingInfo)
-
-
 	// ubc coordinates for centring
 	const center = {
 		lat: 49.26596405700797,
