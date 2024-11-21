@@ -16,7 +16,7 @@ const UBCMap = () => {
 
 	return (
 		<div style={mapStyles}>
-			<LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY || "AIzaSyCZb61HwSZY7b6X558GbsxCxI9-8P-_8Is"}>
+			<LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
 				<GoogleMap
 					mapContainerStyle={mapStyles}
 					zoom={16}

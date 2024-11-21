@@ -15,5 +15,5 @@ data/
 
 # Normal Things
 .DS_Store
-.env
+.env.local
 *.log
