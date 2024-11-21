@@ -6,28 +6,30 @@ import { getRooms } from './store/queries';
 import BottomPanel from "./components/Panels/BottomPanel";
 import RightPanel from './components/Panels/RightPanel';
 import UBCMap from './components/UBCMap';
+import { groupRoomsByBuilding } from './store/helpers';
 
 function App() {
 
-  const [roomData, setRoomData] = useState([]);
-  const [selectedRooms, setSelectedRooms] = useState([])
+	const [roomData, setRoomData] = useState([]);
+	const [selectedRooms, setSelectedRooms] = useState([]);
 
-  console.log(selectedRooms)
+	console.log(selectedRooms)
 
-  const states = {
-    "roomData": roomData,
-    "setRoomData": setRoomData,
-    "selectedRooms": selectedRooms,
-    "setSelectedRooms": setSelectedRooms
-  }
+	const states = {
+		"roomData": roomData,
+		"setRoomData": setRoomData,
+		"selectedRooms": selectedRooms,
+		"setSelectedRooms": setSelectedRooms,
+		"roomsByBuilding": groupRoomsByBuilding(roomData)
+	}
 
-  useEffect(() => {
-    const fetchRooms = async () => {
-      const res = await getRooms();
-      setRoomData(res.result);
-    }
-    fetchRooms();
-  }, [])
+	useEffect(() => {
+		const fetchRooms = async () => {
+			const res = await getRooms();
+			setRoomData(res.result);
+		}
+		fetchRooms();
+	}, [])
 
 	return (
 		<div className="App vh-100">
@@ -38,7 +40,7 @@ function App() {
 
 				<div className="col-8 position-relative h-100">
 					<div className="h-100">
-						<UBCMap />
+						<UBCMap states={states} />
 					</div>
 					<BottomPanel states={states} />
 				</div>

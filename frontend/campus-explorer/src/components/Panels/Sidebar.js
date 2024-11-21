@@ -14,33 +14,20 @@ const toggleRoomSelection = (room, selectedRooms, setSelectedRooms) => {
 
 function Sidebar({ states }) {
 
-    const buildingRooms = []
-    let prevBuilding = null;
-    let buildingIdx = -1;
-    for (let room of states.roomData) {
-        if (room.rooms_shortname !== prevBuilding) {
-            buildingRooms.push([]);
-            buildingIdx += 1;
-            prevBuilding = room.rooms_shortname
-        }
-        buildingRooms[buildingIdx].push(room)
-
-    }
-
-	return (
-		<div className="sidebar-container">
-			<Accordion>
-				{buildingRooms.map((building, idx) =>
-					SidebarBuilding({
-						name: building[0].rooms_shortname,
-						idx: idx.toString(),
-						rooms: building,
-						states: states
-					})
-				)}
-			</Accordion>
-		</div>
-	);
+    return (
+        <div className="sidebar-container">
+            <Accordion>
+                {states.roomsByBuilding.map((building, idx) =>
+                    SidebarBuilding({
+                        name: building[0].rooms_shortname,
+                        idx: idx.toString(),
+                        rooms: building,
+                        states: states
+                    })
+                )}
+            </Accordion>
+        </div>
+    );
 }
 
 function SidebarBuilding({ name, idx, rooms, states }) {
