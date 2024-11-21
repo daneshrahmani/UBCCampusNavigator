@@ -29,7 +29,7 @@ function Sidebar({ states }) {
 
 	return (
 		<div className="sidebar-container">
-			<Accordion defaultActiveKey="0">
+			<Accordion>
 				{buildingRooms.map((building, idx) =>
 					SidebarBuilding({
 						name: building[0].rooms_shortname,
