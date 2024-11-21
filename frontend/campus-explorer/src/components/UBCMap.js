@@ -10,12 +10,12 @@ const UBCMap = () => {
 	};
 
 	const mapStyles = {
-		height: "800px",
+		height: "89%",
 		width: "100%"
 	};
 
 	return (
-		<div style={{ height: '100%', width: '100%' }}>
+		<div style={mapStyles}>
 			<LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY || "AIzaSyCZb61HwSZY7b6X558GbsxCxI9-8P-_8Is"}>
 				<GoogleMap
 					mapContainerStyle={mapStyles}
