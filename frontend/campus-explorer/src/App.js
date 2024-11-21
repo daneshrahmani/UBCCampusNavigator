@@ -39,7 +39,8 @@ function App() {
 		const fetchRooms = async () => {
 			const res = await getRooms();
 			setRoomData(res.result);
-			const maxCapacity = getMaxRoomCapacity(res.result)
+			let maxCapacity = getMaxRoomCapacity(res.result)
+			maxCapacity = Math.ceil(maxCapacity / 100) * 100
 			setMaxRoomCapacity(maxCapacity)
 			setFilters({
 				roomType: "Any",

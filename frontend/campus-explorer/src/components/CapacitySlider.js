@@ -9,10 +9,11 @@ export default function CapacitySlider({states}) {
         states.setSelectedRooms(prevRooms => prevRooms.filter(room => room.rooms_seats >= e[0] && room.rooms_seats <= e[1]))
     }
 
-    console.log(states.filters.capacityRange)
-
     return (
         <div>
+            <div>
+                Seating Capacity: {states.filters.capacityRange[0]} to {states.filters.capacityRange[1]}
+            </div>
             <Slider
                 range
                 max={states.maxRoomCapacity}
