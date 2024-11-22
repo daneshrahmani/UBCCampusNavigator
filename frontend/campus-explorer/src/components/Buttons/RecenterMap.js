@@ -26,14 +26,20 @@ export default function RecenterMap({ map }) {
 	};
 
 	return (
-		<div>
-			<button
-				type="button"
-				style={controlStyle}
-				onClick={handleClick}
-			>
-				Center UBC
-			</button>
+		<div style={{
+			position: 'absolute',
+			top: '0',
+			right: '40px'
+		}}>
+			<div>
+				<button
+					type="button"
+					style={controlStyle}
+					onClick={handleClick}
+				>
+					Center UBC
+				</button>
+			</div>
 		</div>
 	);
 }

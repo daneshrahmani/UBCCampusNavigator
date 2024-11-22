@@ -24,7 +24,7 @@ function App() {
 	const [maxRoomCapacity, setMaxRoomCapacity] = useState(0);
 
 	const [directionsPair, setDirectionsPair] = useState(null);
-	const [directionsResponse, setDirectionsResponse] = useState(null);
+	const [directionsResponses, setDirectionsResponses] = useState([]);
 	const [travelMode, setTravelMode] = useState("WALKING")
 
 	const states = {
@@ -39,8 +39,8 @@ function App() {
 		"maxRoomCapacity": maxRoomCapacity,
 		"directionsPair": directionsPair,
 		"setDirectionsPair": setDirectionsPair,
-		"directionsResponse": directionsResponse,
-		"setDirectionsResponse": setDirectionsResponse,
+		"directionsResponses": directionsResponses,
+		"setDirectionsResponses": setDirectionsResponses,
 		"travelMode": travelMode,
 		"setTravelMode": setTravelMode
 	}
