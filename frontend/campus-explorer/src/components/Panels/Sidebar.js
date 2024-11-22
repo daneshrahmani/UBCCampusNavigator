@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Accordion from 'react-bootstrap/Accordion';
 import "../../styling/sidebar.css"
 import ubcLogo from "../../Utils/ubc-logo.png"
@@ -18,11 +18,18 @@ const toggleRoomSelection = (room, selectedRooms, setSelectedRooms) => {
 
 function Sidebar({ states }) {
 
+	const [activeKey, setActiveKey] = useState(null);
 	const buildingIndex = states.roomsByBuilding.findIndex(
 		building => building[0].rooms_shortname === states.selectedBuilding
 	);
 
 	const accordionRefs = useRef({});
+
+	useEffect(() => {
+		if (states.selectedBuilding) {
+			setActiveKey(buildingIndex.toString());
+		}
+	}, [states.selectedBuilding, buildingIndex]);
 
 	useEffect(() => {
 		if (states.selectedBuilding && accordionRefs.current[states.selectedBuilding]) {
@@ -47,8 +54,10 @@ function Sidebar({ states }) {
 					<span className="sidebar-title ms-2">UBC Campus Explorer</span>
 				</div>
 			</div>
-			<Accordion activeKey={states.selectedBuilding ? buildingIndex.toString() : null}>
-				{states.roomsByBuilding.map((building, idx) =>
+			<Accordion
+				activeKey={activeKey}
+				onSelect={(key) => setActiveKey(key)}
+			>				{states.roomsByBuilding.map((building, idx) =>
 					SidebarBuilding({
 						name: building[0].rooms_shortname,
 						idx: idx.toString(),

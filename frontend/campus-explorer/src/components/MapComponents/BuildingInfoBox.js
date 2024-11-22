@@ -4,9 +4,6 @@ import { FaMapMarkerAlt } from 'react-icons/fa';
 import '../../styling/BuildingInfoBox.css';
 
 export default function BuildingInfoBox({ building }) {
-	console.log(building, "aaaa")
-	console.log(building.shortname.toLowerCase())
-	console.log(building.fullname)
 	const formattedFullName = building.fullname
 		.replace(/\s+/g, '-')
 		.replace(/\./g, '')
