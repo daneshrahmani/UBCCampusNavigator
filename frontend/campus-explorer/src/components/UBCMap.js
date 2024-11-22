@@ -1,5 +1,5 @@
 import { GoogleMap, LoadScript, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import BuildingInfoBox from "./MapComponents/BuildingInfoBox";
 import BuildingMarker from "./MapComponents/BuildingMarker";
 import RecenterMap from "./Buttons/RecenterMap";
@@ -46,15 +46,14 @@ const UBCMap = ({ states }) => {
 					)}
 
 					{
-						states.directionsPair &&
+						states.directionsPair && !states.directionsResponse &&
 						<DirectionsService
 							options={{
 								origin: { lat: states.directionsPair[0].rooms_lat, lng: states.directionsPair[0].rooms_lon },
 								destination: { lat: states.directionsPair[1].rooms_lat, lng: states.directionsPair[1].rooms_lon },
-								travelMode: 'WALKING'
+								travelMode: states.travelMode
 							}}
 							callback={res => {
-								states.setDirectionsPair(null)
 								states.setDirectionsResponse(res)
 							}}
 						/>

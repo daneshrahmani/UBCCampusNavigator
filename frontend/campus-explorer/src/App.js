@@ -25,6 +25,7 @@ function App() {
 
 	const [directionsPair, setDirectionsPair] = useState(null);
 	const [directionsResponse, setDirectionsResponse] = useState(null);
+	const [travelMode, setTravelMode] = useState("WALKING")
 
 	const states = {
 		"filters": filters,
@@ -39,7 +40,9 @@ function App() {
 		"directionsPair": directionsPair,
 		"setDirectionsPair": setDirectionsPair,
 		"directionsResponse": directionsResponse,
-		"setDirectionsResponse": setDirectionsResponse
+		"setDirectionsResponse": setDirectionsResponse,
+		"travelMode": travelMode,
+		"setTravelMode": setTravelMode
 	}
 
 	useEffect(() => {

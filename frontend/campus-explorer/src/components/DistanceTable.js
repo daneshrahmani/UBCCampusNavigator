@@ -3,6 +3,7 @@ import Table from 'react-bootstrap/Table'
 import GetDirections from "./Buttons/GetDirections";
 import { getDistance } from "../Utils/RoomSelectedDistance";
 import Button from 'react-bootstrap/esm/Button';
+import Form from "react-bootstrap/Form"
 
 export default function DistanceTable({ states }) {
 	const { selectedRooms } = states;
@@ -34,6 +35,28 @@ export default function DistanceTable({ states }) {
 					))}
 				</tbody>
 			</Table>
+			<Form>
+				<div key={`default-radio`} className="mb-3">
+					<Form.Check // prettier-ignore
+						type="radio"
+						label="Walking"
+						checked={states.travelMode === "WALKING"}
+						onClick={() => {
+							states.setTravelMode("WALKING")
+							states.setDirectionsResponse(null)
+						}}
+					/>
+					<Form.Check
+						type="radio"
+						label="Bicycling"
+						checked={states.travelMode === "BICYCLING"}
+						onClick={() => {
+							states.setTravelMode("BICYCLING")
+							states.setDirectionsResponse(null)
+						}}
+					/>
+				</div>
+			</Form>
 			<Button
 				className="mb-1"
 				variant="outline-secondary"

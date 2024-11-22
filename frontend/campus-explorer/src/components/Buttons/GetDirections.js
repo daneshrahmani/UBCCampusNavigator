@@ -6,7 +6,10 @@ export default function GetDirections({ pair, states }) {
 		<Button
 			variant="outline-primary"
 			size="sm"
-			onClick={() => states.setDirectionsPair(pair)}
+			onClick={() => {
+				states.setDirectionsPair(pair)
+				states.setDirectionsResponse(null)
+			}}
 		>
 			Directions
 		</Button>
