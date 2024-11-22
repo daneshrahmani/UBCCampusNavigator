@@ -36,6 +36,7 @@ const UBCMap = ({ states }) => {
 							key={building.shortname}
 							building={building}
 							onClick={handleMarkerClick}
+							states={states}
 						/>
 					))}
 

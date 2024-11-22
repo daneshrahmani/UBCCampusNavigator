@@ -1,14 +1,14 @@
 import React from 'react';
 import { Marker } from '@react-google-maps/api';
 
-export default function BuildingMarker({ building, onClick }) {
+export default function BuildingMarker({ building, onClick, states }) {
 	return (
 		<Marker
 			key={building.shortname}
 			position={{ lat: building.lat, lng: building.lon }}
 			label={building.shortname}
 			icon={null}
-			onClick={() => onClick(building)}
+			onClick={() => onClick(building, states)}
 		/>
 	);
 }

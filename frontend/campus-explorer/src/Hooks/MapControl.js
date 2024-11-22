@@ -8,8 +8,9 @@ export function useMapControl() {
 		mapRef.current = map;
 	};
 
-	const handleMarkerClick = (building) => {
+	const handleMarkerClick = (building, states) => {
 		setSelectedBuilding(building.shortname);
+		states.setSelectedBuilding(building.shortname);
 		if (mapRef.current) {
 			mapRef.current.panTo({ lat: building.lat, lng: building.lon });
 		}
