@@ -2,3 +2,27 @@
 	height: 100vh;
 	overflow-y: auto;
 }
+
+.sidebar-header {
+	background-color: #f8f9fa;
+	border-bottom: 1px solid #dee2e6;
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	width: 100%;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-logo-title {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+}
+
+.sidebar-title {
+	font-family: "Montserrat", sans-serif;
+	font-weight: 600;
+	font-size: 1.25rem;
+	color: #333;
+}
+
