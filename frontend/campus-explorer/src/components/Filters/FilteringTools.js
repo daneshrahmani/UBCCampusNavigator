@@ -1,7 +1,7 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import CapacitySlider from "./CapacitySlider";
-import ClearFiltersButton from "./Buttons/ClearFilters";
+import ClearFiltersButton from "../Buttons/ClearFilters";
 
 export default function FilteringTools({ states }) {
 

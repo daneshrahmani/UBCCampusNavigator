@@ -1,11 +1,11 @@
 import { GoogleMap, LoadScript, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
 import React, { useEffect, useState } from 'react';
-import BuildingInfoBox from "./MapComponents/BuildingInfoBox";
-import BuildingMarker from "./MapComponents/BuildingMarker";
-import RecenterMap from "./Buttons/RecenterMap";
-import { useBuildingInfo } from "../Hooks/BuildingInfo";
-import { useMapControl } from "../Hooks/MapControl";
-import { MAP_STYLES, MAP_OPTIONS, UBC_CENTER } from "../constants/mapConstants";
+import BuildingInfoBox from "./BuildingInfoBox";
+import BuildingMarker from "./BuildingMarker";
+import RecenterMap from "../Buttons/RecenterMap";
+import { useBuildingInfo } from "../../Hooks/BuildingInfo";
+import { useMapControl } from "../../Hooks/MapControl";
+import { MAP_STYLES, MAP_OPTIONS, UBC_CENTER } from "../../constants/mapConstants";
 
 const UBCMap = ({ states }) => {
 	const buildingInfo = useBuildingInfo(states.roomsByBuilding);
