@@ -19,25 +19,29 @@ export default function DistanceTable({ states }) {
 
 	return (
 		<div>
-			<Table striped border hover>
-				<thead>
-					<tr>
-						<th>Rooms</th>
-						<th>Distance (m)</th>
-					</tr>
-				</thead>
-				<tbody>
-					{pairs.map((pair, index) => (
-						<tr key={index}>
-							<td>{`${pair[0].rooms_name.replace("_", " ")} - ${pair[1].rooms_name.replace("_", " ")}`}</td>
-							<td>{getDistance(pair[0], pair[1])}</td>
-							<td><GetDirections pair={pair} states={states} /></td>
+			{selectedRooms.length < 2 ?
+				<b>Select at least two rooms for directions</b>
+				:
+				<Table striped border hover>
+					<thead>
+						<tr>
+							<th>Rooms</th>
+							<th>Distance (m)</th>
 						</tr>
-					))}
-				</tbody>
-			</Table>
+					</thead>
+					<tbody>
+						{pairs.map((pair, index) => (
+							<tr key={index}>
+								<td>{`${pair[0].rooms_name.replace("_", " ")} - ${pair[1].rooms_name.replace("_", " ")}`}</td>
+								<td>{getDistance(pair[0], pair[1])}</td>
+								<td><GetDirections pair={pair} states={states} /></td>
+							</tr>
+						))}
+					</tbody>
+				</Table>
+			}
 			<Form>
-				<TransportationModeToggle states={states}/>
+				<TransportationModeToggle states={states} />
 			</Form>
 			<ClearDirections states={states} />
 		</div>

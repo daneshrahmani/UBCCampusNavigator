@@ -16,18 +16,15 @@ function RightPanel({ states }) {
 			</div>
 
 			<div>
-				<FilteringTools states={states}/>
+				<FilteringTools states={states} />
 			</div>
 
-			{
-				selectedRooms.length >= 2 &&
-				<div className="card mt-2">
-					<DistanceTable states={states}/>
-				</div>
-			}
+			<div className="card mt-2 p-2">
+				<DistanceTable states={states} />
+			</div>
 
 			<div className="mt-auto">
-				<ClearSelectedRoomsButton states={states}/>
+				<ClearSelectedRoomsButton states={states} />
 			</div>
 		</div>
 	);
