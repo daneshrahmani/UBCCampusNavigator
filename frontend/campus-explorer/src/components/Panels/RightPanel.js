@@ -1,7 +1,7 @@
 import React from 'react';
 import ClearSelectedRoomsButton from "../Buttons/ClearSelectedRoomsButton";
-import DistanceTable from '../DistanceTable';
-import FilteringTools from '../FilteringTools';
+import DistanceTable from '../Tables/DistanceTable';
+import FilteringTools from '../Filters/FilteringTools';
 
 function RightPanel({ states }) {
 	const { selectedRooms } = states;

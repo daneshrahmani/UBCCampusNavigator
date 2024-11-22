@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { getRooms } from './store/queries';
 import BottomPanel from "./components/Panels/BottomPanel";
 import RightPanel from './components/Panels/RightPanel';
-import UBCMap from './components/UBCMap';
+import UBCMap from './components/MapComponents/UBCMap';
 import { getFilteredRooms, getMaxRoomCapacity, groupRoomsByBuilding } from './store/helpers';
 
 function App() {
