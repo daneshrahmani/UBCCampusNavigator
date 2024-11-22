@@ -1,83 +1,58 @@
-import { GoogleMap, InfoBox, LoadScript, Marker } from '@react-google-maps/api';
-import React, { useState } from 'react';
+import { GoogleMap, LoadScript } from '@react-google-maps/api';
+import React from 'react';
+import BuildingInfoBox from "./MapComponents/BuildingInfoBox";
+import BuildingMarker from "./MapComponents/BuildingMarker";
+import RecenterMap from "./Buttons/RecenterMap";
+import { useBuildingInfo } from "./Hooks/BuildingInfo";
+import { useMapControl } from "./Hooks/MapControl";
+import { MAP_STYLES, MAP_OPTIONS, UBC_CENTER } from "../constants/mapConstants";
 
-const mapOptions = {
-	styles: [
-		{
-			featureType: "all",
-			elementType: "labels",
-			stylers: [{ visibility: "off" }],
-		},
-	],
-};
-
-// NOTE: If we want to use the ubc wayfinding and maps api with leaflet and react-leflet only minimal changes are needed
 const UBCMap = ({ states }) => {
-
-	const { roomsByBuilding } = states;
-	const buildingInfo = []
-
-	for (let building of roomsByBuilding) {
-		buildingInfo.push({
-			fullname: building[0].rooms_fullname,
-			shortname: building[0].rooms_shortname,
-			address: building[0].rooms_address,
-			roomCount: building.length,
-			lat: building[0].rooms_lat,
-			lon: building[0].rooms_lon
-		})
-	}
-
-	// ubc coordinates for centring
-	const [center, setCenter] = useState({
-		lat: 49.26596405700797,
-		lng: -123.25266284768082
-	})
-
-	const [selectedBuilding, setSelectedBuilding] = useState(null)
-
-	const mapStyles = {
-		height: "89%",
-		width: "100%"
-	};
+	const buildingInfo = useBuildingInfo(states.roomsByBuilding);
+	const {
+		mapRef,
+		selectedBuilding,
+		handleMapLoad,
+		handleMarkerClick,
+		handleMapClick
+	} = useMapControl();
 
 	return (
-		<div style={mapStyles}>
+		<div style={MAP_STYLES}>
 			<LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
 				<GoogleMap
-					mapContainerStyle={mapStyles}
-					zoom={15.8}
-					center={center}
-					options={mapOptions}
-					onClick={() => setSelectedBuilding(null)}
+					mapContainerStyle={MAP_STYLES}
+					zoom={15}
+					center={UBC_CENTER}
+					options={MAP_OPTIONS}
+					onClick={handleMapClick}
+					onLoad={handleMapLoad}
 				>
-					{buildingInfo.map(b => (
-						<Marker
-							position={{ lat: b.lat, lng: b.lon }}
-							label={b.shortname}
-							icon={null}
-							onClick={() => {
-								setCenter({lat: b.lat, lng: b.lon})
-								setSelectedBuilding(b.shortname)
-							}}
+					{buildingInfo.map(building => (
+						<BuildingMarker
+							key={building.shortname}
+							building={building}
+							onClick={handleMarkerClick}
 						/>
 					))}
-					{buildingInfo.map(b => {
-						if (b.shortname === selectedBuilding) {
-							return (
-								<InfoBox
-									position={{ lat: b.lat, lng: b.lon }}
-									options={{closeBoxURL: ""}}
-								>
-									<div className="card">
-										<p>{`${b.fullname} (${b.shortname})`}</p>
-										<p>{b.address}</p>
-										<p>Rooms Matching Filters: {b.roomCount}</p>
-									</div>
-								</InfoBox>
-							)
-						}
-					})}
+
+					{buildingInfo.map(building =>
+						building.shortname === selectedBuilding ? (
+							<BuildingInfoBox
+								key={`info-${building.shortname}`}
+								building={building}
+							/>
+						) : null
+					)}
+
+					{/*Help from ChatGPT*/}
+					<div style={{
+						position: 'absolute',
+						top: '0',
+						right: '40px'  // Space for the fullscreen button
+					}}>
+						<RecenterMap map={mapRef?.current}/>
+					</div>
 				</GoogleMap>
 			</LoadScript>
 		</div>
