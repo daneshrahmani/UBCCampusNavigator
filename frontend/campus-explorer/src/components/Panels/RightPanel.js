@@ -8,22 +8,21 @@ function RightPanel({ states }) {
 
 	return (
 		<div className="p-3 border-start h-100 d-flex flex-column">
-			<div className="card mb-2">
-				<h5>Room Analysis</h5>
-				<div>
-					<h6>Summary</h6>
+			<div className="card mb-3 w-100">
+				<div className="card-body text-center">
+					<h5 className="card-title">Room Analysis</h5>
 					<p>Selected Rooms: {selectedRooms.length}</p>
 				</div>
 			</div>
 
 			<div>
-				<FilteringTools states={states} />
+				<FilteringTools states={states}/>
 			</div>
 
 			{
 				selectedRooms.length >= 2 &&
 				<div className="card mt-2">
-					<DistanceTable states={states} />
+					<DistanceTable states={states}/>
 				</div>
 			}
 
