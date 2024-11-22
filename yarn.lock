@@ -237,19 +237,6 @@
   resolved "https://registry.npmjs.org/@eslint/js/-/js-8.57.0.tgz"
   integrity sha512-Ys+3g2TaW7gADOJzPt83SJtCDhMjndcDMFVQ/Tj9iA1BfJzFKD9mAUXT3OenpuPHbI6P/myECxRJrofUsDx/5g==
 
-"@googlemaps/js-api-loader@1.16.8":
-  version "1.16.8"
-  resolved "https://registry.npmjs.org/@googlemaps/js-api-loader/-/js-api-loader-1.16.8.tgz"
-  integrity sha512-CROqqwfKotdO6EBjZO/gQGVTbeDps5V7Mt9+8+5Q+jTg5CRMi3Ii/L9PmV3USROrt2uWxtGzJHORmByxyo9pSQ==
-
-"@googlemaps/markerclusterer@2.5.3":
-  version "2.5.3"
-  resolved "https://registry.npmjs.org/@googlemaps/markerclusterer/-/markerclusterer-2.5.3.tgz"
-  integrity sha512-x7lX0R5yYOoiNectr10wLgCBasNcXFHiADIBdmn7jQllF2B5ENQw5XtZK+hIw4xnV0Df0xhN4LN98XqA5jaiOw==
-  dependencies:
-    fast-deep-equal "^3.1.3"
-    supercluster "^8.0.1"
-
 "@humanwhocodes/config-array@^0.11.14":
   version "0.11.14"
   resolved "https://registry.npmjs.org/@humanwhocodes/config-array/-/config-array-0.11.14.tgz"
@@ -351,33 +338,6 @@
   resolved "https://registry.npmjs.org/@pkgr/core/-/core-0.1.1.tgz"
   integrity sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==
 
-"@react-google-maps/api@^2.20.3":
-  version "2.20.3"
-  resolved "https://registry.npmjs.org/@react-google-maps/api/-/api-2.20.3.tgz"
-  integrity sha512-ndXC8nZDPT78nCceZnftGSvA/iVhwx2XhlfEYaoUy2biGelhrE2vDzjyTuZhb4RV+bVYpd4LkIf3hzyxAFd+Qg==
-  dependencies:
-    "@googlemaps/js-api-loader" "1.16.8"
-    "@googlemaps/markerclusterer" "2.5.3"
-    "@react-google-maps/infobox" "2.20.0"
-    "@react-google-maps/marker-clusterer" "2.20.0"
-    "@types/google.maps" "3.58.1"
-    invariant "2.2.4"
-
-"@react-google-maps/infobox@2.20.0":
-  version "2.20.0"
-  resolved "https://registry.npmjs.org/@react-google-maps/infobox/-/infobox-2.20.0.tgz"
-  integrity sha512-03PJHjohhaVLkX6+NHhlr8CIlvUxWaXhryqDjyaZ8iIqqix/nV8GFdz9O3m5OsjtxtNho09F/15j14yV0nuyLQ==
-
-"@react-google-maps/marker-clusterer@2.20.0":
-  version "2.20.0"
-  resolved "https://registry.npmjs.org/@react-google-maps/marker-clusterer/-/marker-clusterer-2.20.0.tgz"
-  integrity sha512-tieX9Va5w1yP88vMgfH1pHTacDQ9TgDTjox3tLlisKDXRQWdjw+QeVVghhf5XqqIxXHgPdcGwBvKY6UP+SIvLw==
-
-"@react-leaflet/core@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.npmjs.org/@react-leaflet/core/-/core-2.1.0.tgz"
-  integrity sha512-Qk7Pfu8BSarKGqILj4x7bCSZ1pjuAPZ+qmRwH5S7mDS91VSbVVsJSrW4qA+GPrro8t69gFYVMWb1Zc4yFmPiVg==
-
 "@tsconfig/node10@^1.0.7":
   version "1.0.9"
   resolved "https://registry.npmjs.org/@tsconfig/node10/-/node10-1.0.9.tgz"
@@ -440,7 +400,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/cookiejar@*", "@types/cookiejar@^2.1.5":
+"@types/cookiejar@*":
   version "2.1.5"
   resolved "https://registry.npmjs.org/@types/cookiejar/-/cookiejar-2.1.5.tgz"
   integrity sha512-he+DHOWReW0nghN24E1WUqM0efK4kI9oTqDm6XmK8ZPe2djZ90BSNdGnIyCLzCPw7/pogPlGbzI2wHGGmi4O/Q==
@@ -479,11 +439,6 @@
   dependencies:
     "@types/node" "*"
 
-"@types/google.maps@3.58.1":
-  version "3.58.1"
-  resolved "https://registry.npmjs.org/@types/google.maps/-/google.maps-3.58.1.tgz"
-  integrity sha512-X9QTSvGJ0nCfMzYOnaVs/k6/4L+7F5uCS+4iUmkLEls6J9S/Phv+m/i3mDeyc49ZBgwab3EFO1HEoBY7k98EGQ==
-
 "@types/http-errors@*":
   version "2.0.4"
   resolved "https://registry.npmjs.org/@types/http-errors/-/http-errors-2.0.4.tgz"
@@ -498,11 +453,6 @@
   version "0.0.29"
   resolved "https://registry.npmjs.org/@types/json5/-/json5-0.0.29.tgz"
   integrity sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==
-
-"@types/methods@^1.1.4":
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/@types/methods/-/methods-1.1.4.tgz#d3b7ac30ac47c91054ea951ce9eed07b1051e547"
-  integrity sha512-ymXWVrDiCxTBE3+RIrrP533E70eA+9qu7zdWoHuOmGujkYtzf4HQF96b8nwHLqhuf4ykX61IGRIB38CC6/sImQ==
 
 "@types/mime@*":
   version "3.0.4"
@@ -2508,13 +2458,6 @@ internal-slot@^1.0.7:
     hasown "^2.0.0"
     side-channel "^1.0.4"
 
-invariant@2.2.4:
-  version "2.2.4"
-  resolved "https://registry.npmjs.org/invariant/-/invariant-2.2.4.tgz"
-  integrity sha512-phJfQVBuaJM5raOpJjSfkiD6BpbCE4Ns//LaXl6wGYtUBY83nWS6Rf9tXm2e8VaK60JEjYldbPif/A2B1C2gNA==
-  dependencies:
-    loose-envify "^1.0.0"
-
 ip-regex@^2.0.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/ip-regex/-/ip-regex-2.1.0.tgz"
@@ -2881,22 +2824,12 @@ jszip@3.10.1:
     readable-stream "~2.3.6"
     setimmediate "^1.0.5"
 
-kdbush@^4.0.2:
-  version "4.0.2"
-  resolved "https://registry.npmjs.org/kdbush/-/kdbush-4.0.2.tgz"
-  integrity sha512-WbCVYJ27Sz8zi9Q7Q0xHC+05iwkm3Znipc2XTlrnJbsHMYktW4hPhXUE8Ys1engBrvffoSCqbil1JQAa7clRpA==
-
 keyv@^4.5.3:
   version "4.5.4"
   resolved "https://registry.npmjs.org/keyv/-/keyv-4.5.4.tgz"
   integrity sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==
   dependencies:
     json-buffer "3.0.1"
-
-leaflet@^1.9.0, leaflet@^1.9.4:
-  version "1.9.4"
-  resolved "https://registry.npmjs.org/leaflet/-/leaflet-1.9.4.tgz"
-  integrity sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==
 
 levn@^0.4.1:
   version "0.4.1"
@@ -2945,7 +2878,7 @@ log-symbols@4.1.0:
     chalk "^4.1.0"
     is-unicode-supported "^0.1.0"
 
-loose-envify@^1.0.0, loose-envify@^1.1.0:
+loose-envify@^1.1.0:
   version "1.4.0"
   resolved "https://registry.npmjs.org/loose-envify/-/loose-envify-1.4.0.tgz"
   integrity sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==
@@ -3467,22 +3400,12 @@ raw-body@2.5.1:
     iconv-lite "0.4.24"
     unpipe "1.0.0"
 
-"react-dom@^16.8 || ^17 || ^18", react-dom@^18.0.0:
-  version "18.3.1"
-  resolved "https://registry.npmjs.org/react-dom/-/react-dom-18.3.1.tgz"
-  integrity sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==
-  dependencies:
-    loose-envify "^1.1.0"
-    scheduler "^0.23.2"
+react-icons@^5.3.0:
+  version "5.3.0"
+  resolved "https://registry.npmjs.org/react-icons/-/react-icons-5.3.0.tgz"
+  integrity sha512-DnUk8aFbTyQPSkCfF8dbX6kQjXA9DktMeJqfjrg6cK9vwQVMxmcA3BfP4QoiztVmEHtwlTgLFsPuH2NskKT6eg==
 
-react-leaflet@^4.2.1:
-  version "4.2.1"
-  resolved "https://registry.npmjs.org/react-leaflet/-/react-leaflet-4.2.1.tgz"
-  integrity sha512-p9chkvhcKrWn/H/1FFeVSqLdReGwn2qmiobOQGO3BifX+/vV/39qhY8dGqbdcPh1e6jxh/QHriLXr7a4eLFK4Q==
-  dependencies:
-    "@react-leaflet/core" "^2.1.0"
-
-"react@^16.8 || ^17 || ^18", react@^18.0.0, react@^18.3.1:
+react@*:
   version "18.3.1"
   resolved "https://registry.npmjs.org/react/-/react-18.3.1.tgz"
   integrity sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==
@@ -3645,13 +3568,6 @@ safe-regex-test@^1.0.3:
   version "2.1.2"
   resolved "https://registry.npmjs.org/safer-buffer/-/safer-buffer-2.1.2.tgz"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
-
-scheduler@^0.23.2:
-  version "0.23.2"
-  resolved "https://registry.npmjs.org/scheduler/-/scheduler-0.23.2.tgz"
-  integrity sha512-UOShsPwz7NrMUqhR6t0hWjFduvOzbtv7toDH1/hIrfRNIDBnnBWd0CwJTGvTpngVlmwGCdP9/Zl/tVrDqcuYzQ==
-  dependencies:
-    loose-envify "^1.1.0"
 
 semver@^6.0.0, semver@^6.3.0, semver@^6.3.1:
   version "6.3.1"
@@ -3970,13 +3886,6 @@ superagent@^8.0.5, superagent@^8.0.9:
     mime "2.6.0"
     qs "^6.11.0"
     semver "^7.3.8"
-
-supercluster@^8.0.1:
-  version "8.0.1"
-  resolved "https://registry.npmjs.org/supercluster/-/supercluster-8.0.1.tgz"
-  integrity sha512-IiOea5kJ9iqzD2t7QJq/cREyLHTtSmUT6gQsweojg9WH2sYJqZK9SswTu6jrscO6D1G5v5vYZ9ru/eq85lXeZQ==
-  dependencies:
-    kdbush "^4.0.2"
 
 supertest@6.3.3:
   version "6.3.3"
