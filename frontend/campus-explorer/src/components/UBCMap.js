@@ -3,8 +3,8 @@ import React from 'react';
 import BuildingInfoBox from "./MapComponents/BuildingInfoBox";
 import BuildingMarker from "./MapComponents/BuildingMarker";
 import RecenterMap from "./Buttons/RecenterMap";
-import { useBuildingInfo } from "./Hooks/BuildingInfo";
-import { useMapControl } from "./Hooks/MapControl";
+import { useBuildingInfo } from "../Hooks/BuildingInfo";
+import { useMapControl } from "../Hooks/MapControl";
 import { MAP_STYLES, MAP_OPTIONS, UBC_CENTER } from "../constants/mapConstants";
 
 const UBCMap = ({ states }) => {
@@ -19,7 +19,7 @@ const UBCMap = ({ states }) => {
 
 	return (
 		<div style={MAP_STYLES}>
-			<LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
+			<LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY || "AIzaSyCZb61HwSZY7b6X558GbsxCxI9-8P-_8Is"}>
 				<GoogleMap
 					mapContainerStyle={MAP_STYLES}
 					zoom={15}
