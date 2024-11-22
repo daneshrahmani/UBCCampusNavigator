@@ -1,15 +1,13 @@
 import { useState, useRef } from 'react';
 
-export function useMapControl() {
+export function useMapControl(states) {
 	const mapRef = useRef(null);
-	const [selectedBuilding, setSelectedBuilding] = useState(null);
 
 	const handleMapLoad = (map) => {
 		mapRef.current = map;
 	};
 
-	const handleMarkerClick = (building, states) => {
-		setSelectedBuilding(building.shortname);
+	const handleMarkerClick = (building) => {
 		states.setSelectedBuilding(building.shortname);
 		if (mapRef.current) {
 			mapRef.current.panTo({ lat: building.lat, lng: building.lon });
@@ -17,8 +15,10 @@ export function useMapControl() {
 	};
 
 	const handleMapClick = () => {
-		setSelectedBuilding(null);
+		states.setSelectedBuilding(null);
 	};
+
+	const selectedBuilding = states.selectedBuilding;
 
 	return {
 		mapRef,

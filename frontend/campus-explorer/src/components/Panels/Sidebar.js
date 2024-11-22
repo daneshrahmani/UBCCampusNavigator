@@ -5,14 +5,14 @@ import ubcLogo from "../../Utils/ubc-logo.png"
 
 
 const toggleRoomSelection = (room, selectedRooms, setSelectedRooms) => {
-    if (selectedRooms.map(room => room.rooms_name).includes(room.rooms_name)) {
-        setSelectedRooms(prevRooms => prevRooms.filter(prevRoom => prevRoom.rooms_name !== room.rooms_name))
-    }
-    else {
-        if (selectedRooms.length < 5) {
-            setSelectedRooms(prevRooms => [...prevRooms, room]);
-        }
-    }
+	if (selectedRooms.map(room => room.rooms_name).includes(room.rooms_name)) {
+		setSelectedRooms(prevRooms => prevRooms.filter(prevRoom => prevRoom.rooms_name !== room.rooms_name))
+	}
+	else {
+		if (selectedRooms.length < 5) {
+			setSelectedRooms(prevRooms => [...prevRooms, room]);
+		}
+	}
 }
 
 
@@ -58,24 +58,32 @@ function Sidebar({ states }) {
 				activeKey={activeKey}
 				onSelect={(key) => setActiveKey(key)}
 			>				{states.roomsByBuilding.map((building, idx) =>
-					SidebarBuilding({
-						name: building[0].rooms_shortname,
-						idx: idx.toString(),
-						rooms: building,
-						states: states,
-						ref: el => accordionRefs.current[building[0].rooms_shortname] = el
-					})
-				)}
+				SidebarBuilding({
+					name: building[0].rooms_shortname,
+					idx: idx.toString(),
+					rooms: building,
+					states: states,
+					ref: el => accordionRefs.current[building[0].rooms_shortname] = el
+				})
+			)}
 			</Accordion>
 		</div>
 	);
 }
 
-function SidebarBuilding({name, idx, rooms, states, ref}) {
+function SidebarBuilding({ name, idx, rooms, states, ref }) {
 	return (
 		<Accordion.Item
 			eventKey={idx.toString()}
 			ref={ref}
+			onClick={() => {
+				if (states.selectedBuilding === name) {
+					states.setSelectedBuilding(null)
+				}
+				else {
+					states.setSelectedBuilding(name)
+				}
+			}}
 		>
 			<Accordion.Header>{`${name} (${rooms.length})`}</Accordion.Header>
 			<Accordion.Body>
@@ -91,7 +99,7 @@ function SidebarBuilding({name, idx, rooms, states, ref}) {
 	)
 }
 
-function SidebarRoom({room, states}) {
+function SidebarRoom({ room, states }) {
 	return (
 		<div className="text-start">
 			<label>

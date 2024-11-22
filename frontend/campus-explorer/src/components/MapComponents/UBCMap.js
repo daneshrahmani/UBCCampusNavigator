@@ -18,7 +18,7 @@ const UBCMap = ({ states }) => {
 		handleMapLoad,
 		handleMarkerClick,
 		handleMapClick
-	} = useMapControl();
+	} = useMapControl(states);
 
 	return (
 		<div style={MAP_STYLES}>
