@@ -1,4 +1,4 @@
-import { GoogleMap, LoadScript } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
 import React from 'react';
 import BuildingInfoBox from "./MapComponents/BuildingInfoBox";
 import BuildingMarker from "./MapComponents/BuildingMarker";
@@ -45,13 +45,35 @@ const UBCMap = ({ states }) => {
 						) : null
 					)}
 
+					{
+						states.directionsPair &&
+						<DirectionsService
+							options={{
+								origin: { lat: states.directionsPair[0].rooms_lat, lng: states.directionsPair[0].rooms_lon },
+								destination: { lat: states.directionsPair[1].rooms_lat, lng: states.directionsPair[1].rooms_lon },
+								travelMode: 'WALKING'
+							}}
+							callback={res => {
+								states.setDirectionsPair(null)
+								states.setDirectionsResponse(res)
+							}}
+						/>
+					}
+
+					{states.directionsResponse &&
+						<DirectionsRenderer
+							directions={states.directionsResponse}
+							options={{ suppressMarkers: true }}
+						/>
+					}
+
 					{/*Help from ChatGPT*/}
 					<div style={{
 						position: 'absolute',
 						top: '0',
 						right: '40px'  // Space for the fullscreen button
 					}}>
-						<RecenterMap map={mapRef?.current}/>
+						<RecenterMap map={mapRef?.current} />
 					</div>
 				</GoogleMap>
 			</LoadScript>

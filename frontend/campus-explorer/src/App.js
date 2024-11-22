@@ -17,11 +17,14 @@ function App() {
 		capacityRange: [0, 0]
 	})
 
-	const filteredRooms = getFilteredRooms(roomData, filters); 
+	const filteredRooms = getFilteredRooms(roomData, filters);
 	const roomsByBuilding = groupRoomsByBuilding(filteredRooms);
 
-	const [selectedRooms, setSelectedRooms] = useState([]);	
+	const [selectedRooms, setSelectedRooms] = useState([]);
 	const [maxRoomCapacity, setMaxRoomCapacity] = useState(0);
+
+	const [directionsPair, setDirectionsPair] = useState(null);
+	const [directionsResponse, setDirectionsResponse] = useState(null);
 
 	const states = {
 		"filters": filters,
@@ -32,7 +35,11 @@ function App() {
 		"selectedRooms": selectedRooms,
 		"setSelectedRooms": setSelectedRooms,
 		"roomsByBuilding": roomsByBuilding,
-		"maxRoomCapacity": maxRoomCapacity
+		"maxRoomCapacity": maxRoomCapacity,
+		"directionsPair": directionsPair,
+		"setDirectionsPair": setDirectionsPair,
+		"directionsResponse": directionsResponse,
+		"setDirectionsResponse": setDirectionsResponse
 	}
 
 	useEffect(() => {
