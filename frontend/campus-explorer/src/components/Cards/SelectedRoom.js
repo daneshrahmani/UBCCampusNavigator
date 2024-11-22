@@ -1,9 +1,11 @@
 import React from "react";
+import RemoveSelectedRoom from "../Buttons/RemoveSelectedRoom";
 
-function SelectedRoom({room, style}) {
+function SelectedRoom({room, style, onRemove}) {
 	return (
 		<div className="card mb-2" style={style}>
 			<div className="card-body p-1">
+				<RemoveSelectedRoom room={room} onRemove={onRemove} />
 				<h6 className="card-title small mb-1">
 					<a
 						href={`https://learningspaces.ubc.ca/classrooms/${room.rooms_shortname}-${room.rooms_number}`}
