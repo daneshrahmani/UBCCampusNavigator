@@ -1,46 +1,130 @@
-# CPSC 310 Project Repository
+# UBC Campus Navigator
 
-This repository contains starter code for the class project.
-Please keep your repository private.
+## Overview
+UBC Campus Navigator is an interactive web application that helps users explore and understand the UBC campus through an intuitive map interface. The application allows users to view building locations, find detailed room information, and get walking and cycling routes and distances between selected campus locations.
 
-For information about the project, autotest, and the checkpoints, see the course webpage.
+## Demo
+https://www.youtube.com/watch?v=1Gi5HMDOKmw
 
-## Configuring your environment
+## Features
+- **Interactive Map View**: Displays UBC buildings on an interactive Google Maps interface
+- **Room Selection**: Select up to 5 rooms to view detailed information
+- **Room Details**: View comprehensive information for each room including:
+  - Full name
+  - Short name
+  - Room number
+  - Address
+  - Seating capacity
+  - Room type
+  - Furniture type
+- **Distance Calculations**: Calculate walking and cycling times between selected rooms, overlaying directions routes onto the map
+- **Filtering System**: Filter rooms based on various criteria such as capacity and room type
 
-To start using this project, you need to get your development environment configured so that you can build and execute the code.
-To do this, follow these steps; the specifics of each step will vary based on your operating system:
+## Technologies Used
+### Frontend
+- React.js
+- Google Maps API
+- react-google-maps/api Library
+- TypeScript (Server implementation)
 
-1. [Install git](https://git-scm.com/downloads) (v2.X). You should be able to execute `git --version` on the command line after installation is complete.
+### Backend
+- Node.js
+- Express.js
+- RESTful API architecture
+- Parse5 for HTML parsing
+- Geolocation services
 
-1. [Install Node LTS](https://nodejs.org/en/download/) (LTS: v18.X), which will also install NPM (you should be able to execute `node --version` and `npm --version` on the command line).
+### Testing
+- Test-Driven Development (TDD) approach
+- Mocha test framework
+- Chai assertions
 
-1. [Install Yarn](https://yarnpkg.com/en/docs/install) (1.22.X). You should be able to execute `yarn --version`.
+## Architecture
+The application consists of three main components:
+1. **Dataset Processor**: 
+   - Processes HTML and JSON datasets for rooms and courses
+   - Extracts building information from HTML using Parse5
+   - Handles geolocation for building coordinates
+   - Validates and processes course section data
 
-1. Clone your repository by running `git clone REPO_URL` from the command line. You can get the REPO_URL by clicking on the green button on your project repository page on GitHub. Note that due to new department changes you can no longer access private git resources using https and a username and password. You will need to use either [an access token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) or [SSH](https://help.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account).
+2. **Query Engine**: Query system following specified EBNF, supporting:
+   - Logical comparisons (AND, OR)
+   - Numeric comparisons (GT, LT, EQ)
+   - String pattern matching with wildcards
+   - Complex data transformations:
+     - Grouping by multiple fields
+     - Aggregations (MAX, MIN, AVG, COUNT, SUM)
+     - Multi-key sorting with direction control
+   
+3. **RESTful API Endpoints**:
+   - PUT /dataset/:id/:kind - Add new datasets
+   - DELETE /dataset/:id - Remove datasets
+   - POST /query - Execute queries
+   - GET /datasets - List available datasets
+  
+Query Examples:
+```json
+For Rooms:
+{   
+ "WHERE": {       
+     "AND": [{           
+        "IS": {               
+            "rooms_furniture": "*Tables*"           
+         }       
+     }, {           
+         "GT": {               
+           "rooms_seats": 300           
+          }       
+    }]   
+  },   
+  "OPTIONS": {       
+      "COLUMNS": [           
+          "rooms_shortname",           
+          "maxSeats"       
+      ],       
+      "ORDER": {           
+         "dir": "DOWN",           
+         "keys": ["maxSeats"]       
+      }   
+  },   
+  "TRANSFORMATIONS": {       
+      "GROUP": ["rooms_shortname"],       
+      "APPLY": [{           
+          "maxSeats": {               
+              "MAX": "rooms_seats"           
+           }       
+      }]   
+  }
+}
 
-## Project commands
+For Sections:
+{
+    "WHERE": {
+       "GT": {
+          "sections_avg": 97
+       }
+    },
+    "OPTIONS": {
+       "COLUMNS": [
+          "sections_dept",
+          "sections_avg"
+       ],
+       "ORDER": "sections_avg"
+    }
+}
+```
 
-Once your environment is configured you need to further prepare the project's tooling and dependencies.
-In the project folder:
+## Setup and Installation
 
-1. `yarn install` to download the packages specified in your project's *package.json* to the *node_modules* directory.
+### Prerequisites
+- Git (v2.X or higher)
+- Node.js (v18.X or higher)
+- NPM (comes with Node.js)
+- Yarn (1.22.X or higher)
 
-1. `yarn build` to compile your project. You must run this command after making changes to your TypeScript files. If it does not build locally, AutoTest will not be able to build it. This will also run formatting and linting, so make sure to fix those errors too!
-
-1. `yarn test` to run the test suite.
-    - To run with coverage, run `yarn cover`
-
-1. `yarn prettier:fix` to format your project code.
-
-1. `yarn lint:check` to see lint errors in your project code. You may be able to fix some of them using the `yarn lint:fix` command.
-
-
-If you are curious, some of these commands are actually shortcuts defined in [package.json -> scripts](./package.json).
-
-## Running and testing from an IDE
-
-IntelliJ Ultimate should be automatically configured the first time you open the project (IntelliJ Ultimate is a free download through the [JetBrains student program](https://www.jetbrains.com/community/education/#students/)).
-
-### License
-
-While the readings for this course are licensed using [CC-by-SA](https://creativecommons.org/licenses/by-sa/3.0/), **checkpoint descriptions and implementations are considered private materials**. Please do not post or share your project solutions. We go to considerable lengths to make the project an interesting and useful learning experience for this course. This is a great deal of work, and while future students may be tempted by your solutions, posting them does not do them any real favours. Please be considerate with these private materials and not pass them along to others, make your repos public, or post them to other sites online.
+### Installation Steps
+1. Clone the repository:
+```bash
+git clone https://github.com/daneshrahmani/UBCCampusNavigator.git
+cd UBCCampusNavigator
+```
