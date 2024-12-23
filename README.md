@@ -128,3 +128,22 @@ For Sections:
 git clone https://github.com/daneshrahmani/UBCCampusNavigator.git
 cd UBCCampusNavigator
 ```
+2. Install dependencies:
+```bash
+yarn install
+```
+3. Build the Project:
+```bash
+yarn build
+```
+4. Run the application:
+```bash
+yarn start
+```
+Available Commands:
+- yarn build: Compile the project
+- yarn test: Run the test suite
+- yarn cover: Run tests with coverage report
+- yarn prettier:fix: Format code
+- yarn lint:check: Check for lint errors
+- yarn lint:fix: Automatically fix lint errors where possible
